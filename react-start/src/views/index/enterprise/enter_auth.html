@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name='viewport' content="width=device-width, minimum-scale=1.0 user-scalable=no">
+    <title>药企通</title>
+    <link rel="stylesheet" href="/static/index/enterprise/index.css">
+</head>
+<body>
+
+<div class="l_main">
+    <div class='nav-wrraper'>
+        <div class="nav_index">
+            <div class="logo">
+                <img src="http://static.eyaos.com/images/index-logo.png"></div>
+            <div class="nav_list" id="tz-menu-list">
+                <ul>
+                    <li><a href="/">首页</a></li>
+                    <!-- <li><a href="">产品录入</a></li>
+                    <li><a href="">活动发布</a></li> -->
+                <li><a href="/product/tool">中标医保查询</a></li>
+                <li><a href="/information/news/">医药资讯</a></li>
+                <li><a href="/html/renzheng/cailiao">药企通</a></li>
+            </ul>
+        </div>
+        <div class="login">
+            
+            <!-- <input class="input_1" id="tz-menu-login" type="button" value="登录" onclick="location.href='/login'"> -->
+            {% if data.login.is_login %}
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                    {{ data.login.nick }} 
+                    <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu" role="menu">
+                    {% if data.login.is_manage %}
+                  <li>
+                      <span class="iconImg icon-set"></span><a href={{ url }}/news/list>管理中心</a>
+                  </li>
+                  {% endif %}
+                  <li>
+                      <span class="iconImg icon-set"></span><a href={{ url }}/user>个人中心</a>
+                  </li>
+                  <li>
+                      <span class="iconImg icon-set"></span><a href={{ url }}/logout>退出中心</a>
+                  </li>
+                </ul>
+            </li>
+            {% else %}
+
+            <input class="input_1" id="tz-menu-login" type="button" value="登录" onclick="location.href='{{ url }}/login'">
+            {% endif %}
+            <!-- <input class="input_2" type="button" value="注册">-->
+        </div>
+
+        <div id="index-menulist" class="but_list">
+            <img src="http://static.eyaos.com/images/menu_btn.png"></div>
+    </div>
+    <!--nav--> </div>
+
+
+    <div class="yq_head">
+        <img src="/static/index/enterprise/resource/enter_auth.jpg" class="hd_pic" id="bg_pic">
+    </div>
+    <div class="yq_bd">
+        <div class="yq_hd">
+            <div class="bd_tl">
+                入驻企业展示
+            </div>
+            
+        </div>
+        <div class="yb_ai">
+
+        {% for comp in data.comp_list %}
+        
+            <div class="bd_in">
+                <a href=''>
+                    <div class="bi_hd">
+                        <div class="bh_img">
+                            <img src={{ comp.logo_url }} class="bi_im tl">
+                            <div class="tl">
+                            <div class="tcb">{{ comp.name }}</div>
+                            <div class="tcg">{{ comp.focus_num }}人关注</div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <div class="bh_sk">
+                {% for prod in comp.prod_list %}
+                    <a href=/sku/sku_detail/{{ prod.id }}>
+                        <div class="bs_sku">
+                            <img src={{ prod.img_url }} class="sku_img">
+                            <div class="sku_f">{{ prod.name }}</div>
+                            <div class="sku_f">规格&nbsp;{{ prod.spec }}</div>
+                            <div class="sku_f">类型&nbsp;{{ prod.type }}</div>
+                            <div class="sku_a">已有{{ prod.comm_num }}人评价</div>
+                        </div>
+                    </a>
+                {% endfor %}
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+        </div>
+    </div>
+    <div class="yq_ue">
+        <div class="yu_fz">他们都在使用药企通</div>
+        <div class="yu_fy">PHARMACEUTICAL COMPANIES</div>
+        <div class="yu_lg">
+        {% for item in data.logo_list %}
+            <div class="yl_lo">
+                <img  src={{ item }} class="yl_img">
+            </div>
+        {% endfor %}
+
+        </div>
+        <div class="yu_mr">
+            <button class="ym_bt" id='ym_bt'>更多入驻企业</button>
+        </div>
+        <div class="yq_qp" id='yq_qp'>
+            <img src="/static/index/enterprise/resource/download_qrcode.png" class="yq_img">
+        <div class="yq_f">扫二维码下载</div><div class="yq_f">医药新势力APP</div>
+    </div>
+    </div>
+    
+</div>
+<div class="mceng none"></div>
+<div class="popup none">
+    <div class="pp_lf">
+        <div class="tl">联系客服</div>
+        <div class="tt">郭经理&nbsp;:&nbsp;15867171944</div>
+        <div class="tt">王经理&nbsp;:&nbsp;15067096255</div>
+        <div class="tt">邮箱&nbsp;:&nbsp;rz@eyaos.com</div>
+    </div>
+    <div class="pp_rf">
+        <div class="tl">填写下面的信息方便我们联系您</div>
+        <div class="tt">姓名&nbsp;&nbsp;<input type="text" class="ip" id='name'></div>
+        <div class="tt">手机&nbsp;&nbsp;<input type="text" class="ip" id='mobile'></div>
+        <div class="tt">公司&nbsp;&nbsp;<input type="text" class="ip" id='company'></div>
+        <div class="tt">职务&nbsp;&nbsp;<input type="text" class="ip" id='job'></div>
+        <a class="tp">提交<img src="/static/index/enterprise/resource/sub_auth.png" class="pic"></a>
+    </div>
+    </div>
+<script src="/static/common/jquery/jquery-1.12.4.min.js"></script>
+<script src='/static/index/enterprise/index.bundle.js'></script>
+<script type="text/javascript">
+    (function (win) {
+        var doc = win.document;
+        var docEl = doc.documentElement;
+        var tid;
+
+        function refreshRem() {
+            var width = docEl.getBoundingClientRect().width;
+            var browser = navigator.appName
+            var version = navigator.appVersion.split(";");
+            var trim_Version=version[1].replace(/[ ]/g,"");
+            if(width<768|| (browser=="Microsoft Internet Explorer" && trim_Version=="MSIE8.0"))
+            {
+                var rem = width/37.5;
+            }else{
+                var rem = 14;
+            }// 将屏幕宽度分成10份， 1份为1rem
+
+            docEl.style.fontSize = rem + 'px';
+
+        }
+
+        win.addEventListener('resize', function () {
+            clearTimeout(tid);
+            tid = setTimeout(refreshRem, 300);
+        }, false);
+        win.addEventListener('pageshow', function (e) {
+            if (e.persisted) {
+                clearTimeout(tid);
+                tid = setTimeout(refreshRem, 300);
+            }
+        }, false);
+        refreshRem();
+
+    })(window);
+
+</script>
+</body>
+</html>

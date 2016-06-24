@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{ title }}</title>
+	<link rel="stylesheet" href="/static/rpc-test/rpc-start.css">
+</head>
+<body>
+	<h1>RPC Test</h1>
+	<ul>
+		<li>调用ping函数:&nbsp;{{data.ping}}</li>
+		<li>调用add()函数:&nbsp;{{data.add}}</li>
+		<li>调用calculator()函数:&nbsp;{{data.calculator}}</li>
+	</ul>
+	<input type="button" name="test" id='test' class='test' value="Add">
+	<p>cnt: <span id='resutl'>0</span></p>
+	<script src='./static/rpc-test/rpc-start.bundle.js'></script>
+</body>
+</html>

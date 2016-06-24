@@ -1,0 +1,61 @@
+{
+  "name": "eyaos_node",
+  "version": "1.0.0",
+  "description": "eyaos frontend web server",
+  "main": "index.js",
+  "scripts": {
+    "test": "export NODE_ENV='test' && node --harmony bin/dispatch.js",
+    "thrift": "npm run thrift:compile && npm run thrift:modify",
+    "thrift:compile": "thrift -o thrift/lib -I thrift -r -v --gen js:node thrift/entry.thrift",
+    "thrift:modify": "node thrift/lib/modifyThrift.js",
+    "start": "export NODE_ENV='development' && node --harmony bin/dispatch.js",
+    "deploy": "export NODE_ENV='production' && node --harmony bin/dispatch.js",
+    "webpack": "export NODE_ENV='development' && webpack --watch",
+    "build": "export NODE_ENV='production' && webpack --progress --colors"
+  },
+  "keywords": [
+    "eyaos",
+    "node",
+    "front-end",
+    "server",
+    "koa2",
+    "thrift"
+  ],
+  "author": "feifeiyu",
+  "license": "",
+  "dependencies": {
+    "co": "^4.6.0",
+    "graceful": "^1.0.0",
+    "koa": "^2.0.0",
+    "koa-bodyparser": "^3.1.0",
+    "koa-convert": "^1.2.0",
+    "koa-csrf": "^2.4.0",
+    "koa-json": "^1.1.3",
+    "koa-log4": "^2.0.1",
+    "koa-logger": "^2.0.0",
+    "koa-mount": "^2.0.0",
+    "koa-nunjucks-promise": "^1.0.3",
+    "koa-router": "^7.0.1",
+    "koa-session": "^3.3.1",
+    "koa-static": "^3.0.0",
+    "thrift": "^0.9.3",
+    "thunkify-wrap": "^1.0.4"
+  },
+  "devDependencies": {
+    "babel-core": "^6.9.1",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.9.0",
+    "css-loader": "^0.23.1",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "file-loader": "^0.8.5",
+    "less": "^2.7.1",
+    "less-loader": "^2.2.3",
+    "style-loader": "^0.13.1",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.13.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maqmall/eyaos_front.git"
+  }
+}
