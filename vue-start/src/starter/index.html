@@ -5,15 +5,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
-    <title>Hello React!</title>
+    <title>Hello Vue.js!</title>
   </head>
   <body>
     
     <div id='app'>
        <hello></hello>
+       <temp-cond v-if='toShow' :msgs='inputDate'></temp-cond>
+       <button @click="showTemp">Show Temp</button>
+       <p>input: <input type="text" @keyup="getMsgs" v-model='message' placeholder="edit it"></p>
     </div>  
    
     <!-- 打包后，静态文件路径 -->
     <script src="/static/starter/index.bundle.js"></script>  
   </body>
 </html>
+

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1 user-scalable=0"/>
+    <title>2014-5-4</title>
+    <style>
+    * {margin: 0;  padding: 0;}
+    #outer{ width:90%; height: 490px; background: #000; margin: auto;  overflow: hidden;}
+    #inner{width:80%;  background: #e4e4e4; margin: auto; position:relative; top:0px; font-size: 1em; padding: 30px 10px;  }
+    #inner p{line-height: 30px; letter-spacing: 3px; text-indent:2em;}
+    #spText{ height: 40px; width: 100%;border:1px solid red;}
+    h2{ width: 100%; text-align: center; }
+    h3{ width: 100%; padding-left:60%;}
+    </style>
+    <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js'></script>
+</head>
+<body>
+
+<div id="spText2"></div>
+    <div id="outer">
+        <div id="inner">
+            <h2>背影</h2>
+            <h3>—朱自清</h3>
+                <p>我与父亲不相见已二年余了，我最不能忘记的是他的背影
+        那年冬天，祖母死了，父亲的差使也交卸了，正是祸不单行的日子。我从北京到徐州，打算跟着父亲奔丧回家。到徐州见着父亲,看见满院狼藉的东西，又想起祖母，不禁簌簌地流下眼泪。父亲说：“事已如此，不必难过，好在天无绝人之路！
+         </p>
+        </div>
+    </div>
+
+    <script src='./h5TouchEvt.js'></script>
+</body>
+
+</html>
+
+<div>
+    <div class="slider-wrapper">
+        <div class="sliders clearfix" v-el:sliders>
+            <slot></slot>
+        </div>
+    <ul class="slider-nav">
+        <li v-for="n in count">
+            <span class="circle" :class="{\'active\': n === current}"></span>
+        </li>
+        </ul>
+    </div>
+</div>
