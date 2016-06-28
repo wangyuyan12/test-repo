@@ -8,7 +8,7 @@ var isProduction  = false;    //设置为false——开发环境
   // return true;  //设置为true——生产环境
 
 var configDir = {
-  enteryDir: ['./src/sku-detail/index.js', './src/starter/index.js'],
+  enteryDir: ['./src/back/prod-detail/index.js'],
 }
 
 var enteryFiles = function() {
