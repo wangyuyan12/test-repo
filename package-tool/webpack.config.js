@@ -3,17 +3,22 @@ var path = require('path')
 var fs = require('fs')
 var webpack = require('webpack')
 var ExtractTextPlugin = require('extract-text-webpack-plugin')
+var configDir = require('./package.config').configDir
+var extractCss = require('./package.config').extractCss
 
-//判断开发环境还是生产环境
-var isProduction  = process.env.NODE_ENV === 'development' ? false : true   //设置为false——开发环境
-console.log('isProduction', isProduction)
-var extractCss = true
-  // return true;  //设置为true——生产环境
-
-var configDir = {
+//
+/*var configDir = {
   enteryDir: ['./src/add-area/index.js', './src/sku-detail/index.js', './src/prod-detail/index.js'],
   outputDir: '/home/tzf/Documents/front/test-repo/vue-start/assets'  //支持一个输出路径
 }
+
+//是否提取css
+var extractCss = true*/
+
+//判断开发环境还是生产环境
+var isProduction  = process.env.NODE_ENV === 'development' ? false : true   //设置为false——开发环境    // return true;  //设置为true——生产环境
+console.log('isProduction', isProduction)
+
 if(configDir.outputDir === '') {
   configDir.outputDir = path.join(__dirname, 'assets')
 }

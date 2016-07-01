@@ -1,14 +1,14 @@
+process.env.NODE_ENV = 'development'
+
 var webpack = require('webpack')
 var WebpackDevServer = require('webpack-dev-server')
 var config = require('./webpack.config')
-
-process.env.NODE_ENV = 'development'
 
 new WebpackDevServer(webpack(config), {
 	publicPath: config.output.publicPath,
 	hot: true,
 	historyApiFallback: true
-}).listen(3000, 'localhost', function(err, result) {
+}).listen(3000, function(err, result) {
 	if (err) {
 		console.log(err)
 	}
