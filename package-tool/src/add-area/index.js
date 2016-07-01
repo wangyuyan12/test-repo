@@ -209,13 +209,13 @@ $(() => {
 		getCompany(parenNode, $(this).val())
 	})
 
-	$('#to-add').click(() => {
-		let areaUnit = $('.area-unit').clone(true)
-		$(areaUnit).find('.btn-del').css('display', 'block')
+	$('.add-area').click(function() {
+		let areaUnit = $(this).parents('.area-unit').clone(true)
+		$(areaUnit).find('.del-area').css('display', 'block')
 		areaUnit.appendTo('#area-list')
 		console.log($('.area-unit').clone(true).toString())
 	})
-	$('.btn-del').click(function() {
+	$('.del-area').click(function() {
 		$(this).parents('.area-unit').remove()
 	})
 	$('#btn-sub').click(() => {
