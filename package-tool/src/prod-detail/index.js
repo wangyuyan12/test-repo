@@ -3,10 +3,8 @@ import './tz_base.css'
 import $ from 'jquery'
 
 $(() => {
-	console.log('step in')
 	let csrftoken = document.cookie.match(/csrftoken=\w+/ig)[0].replace(/csrftoken=/, '')
 	let skuId = /detail\/\d+/.exec(location.href)[0].replace('detail\/', '')
-	console.log('skuId ', skuId)
 	//加载
 	let rendSku = (sku) => {
 		return '<img src=' + sku.pic + '>'
@@ -72,7 +70,6 @@ $(() => {
 				xhr.setRequestHeader("X-CSRFToken", csrftoken)
 			},
 			success: (data) => {
-				console.log('in success')
 				let sku = data.sku
 				
 				let pub = {

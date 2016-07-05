@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Vue.js</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <link rel="icon" href="static/logo.png" type="image/x-icon">
+  </head>
+  <body>
+    <div id="app">
+      <my-component msg="NOW!"></my-component>
+      <input v-model='parentMsg'>
+      <comp1 :my-message="parentMsg" @child-msg2="msg2Handler(msg)"></comp1>
+      <p>dispatch: {{ messages }}</p>
+      <br>
+
+      <comp-fetch></comp-fetch>
+    </div>
+     <script src="/static/component/index.bundle.js"></script>
+  </body>
+</html>

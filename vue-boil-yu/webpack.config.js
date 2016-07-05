@@ -8,7 +8,7 @@ var isProduction  = false;    //设置为false——开发环境
   // return true;  //设置为true——生产环境
 
 var configDir = {
-  enteryDir: ['./src/sku-detail/index.js'],
+  enteryDir: ['./src/component/index.js'],
 }
 
 var enteryFiles = function() {
@@ -64,20 +64,20 @@ module.exports = {
   plugins: plugins,
 
   module: {
-    loaders: [
-     {
-      test: /\.vue$/,
-      loader: 'vue-loader',
-      include: __dirname,
-      exclude: /node_modules/,
-    }, {
+    loaders: [{
       test:/\.js$/,
       loader:'babel-loader',
       exclude:/node_modules/,
       include:__dirname,
       query:{
         presets: ['es2015'],
-      } 
+        plugins: ['transform-runtime']
+      }
+    }, {
+      test: /\.vue$/,
+      loader: 'vue-loader',
+      exclude: /node_modules/,
+      include: __dirname
     }, {
       test: /\.less$/,
       loader: 'style-loader!css-loader!less-loader',
@@ -88,7 +88,7 @@ module.exports = {
       include: __dirname
     }, {
       test: /\.(jpe?g|png|gif|svg)$/i, 
-      loader: 'url-loader?limit=50000&name=[path][name].[ext]' 
+      loader: 'url-loader?limit=5000&name=[path][name].[ext]' 
     },
     //fonts loader
     { test: /\.(woff|woff2)$/, loader:"url?prefix=font/&limit=5000" },

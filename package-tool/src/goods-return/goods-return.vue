@@ -17,7 +17,7 @@
 			display: inline-block;
 			width: 25%;
 		}
-		.order-operate {
+		.goods-operate {
 			display: inline-block;
 			width: 73%;
 			background-color: #d9d9d9;
@@ -35,15 +35,13 @@
 		vertical-align: middle;
 	}
 
-	
-
 </style>
 
 <template>
 	<div class="page-wrapper">
-		<div class="order-list">
+		<div class="goods-list">
 			<div v-for="prod in prods">
-				<order-block :prod-info="prod"></order-block>
+				<goods-block :prod-info="prod"></goods-block>
 			</div >
 		</div>
 		<div class="footbar">
@@ -54,22 +52,19 @@
 				</span> 
 				<span class="text">全选</span>
 			</span>
-			<span class="order-operate" :style="{backgroundColor: enabelCancel ? '#30b3fb' : '#d9d9d9'}">取消所选药品</span>
+			<span class="goods-operate" :style="{backgroundColor: enabelCancel ? '#30b3fb' : '#d9d9d9'}">确认退货</span>
 		</div>
 	</div>
-	
 </template>
 
 <script>
-import orderBlock from './order-block.vue'
+import goodsBlock from './goods-block.vue'
 
 export default {
-	name: 'orderConcel',
-
+	name: 'goodBlock',
 	components: {
-		'order-block': orderBlock
+		'goods-block': goodsBlock
 	},
-
 	data: function() {
 		return {
 			prods: [
@@ -109,13 +104,13 @@ export default {
 			],
 			selectdItem: [],  //选中的订单
 			selectAll: false,
-			// enabelCancel: false,  //取消
+			enabelCancel: false,  //取消
 		}
 	},
 	methods: {
 		selectAllProd() {
 			this.selectAll = !this.selectAll   //全选标签
-			// this.enabelCancel = this.selectAll  //“取消所选药品”使能控制
+			this.enabelCancel = this.selectAll  //“取消所选药品”使能控制
 			if(this.selectAll) {
 				for(let i=0; i<this.prods.length; i++) {
 					this.selectdItem.push(this.prods[i].id)  //
@@ -139,16 +134,15 @@ export default {
 					}
 				}
 			}
-			// this.enabelCancel = this.selectdItem.length > 0 ? true : false  //“取消所选药品”使能控制
+			this.enabelCancel = this.selectdItem.length > 0 ? true : false  //“取消所选药品”使能控制
 			this.selectAll = this.selectdItem.length === this.prods.length  //
 		}
 	},
 
-	computed: {
-		enabelCancel: function() {
-			return this.selectdItem.length > 0 ? true : false  //“取消所选药品”使能控制
-		}
-	},
+	compiled() {
+		console.log('compiled')
+	}
+
 
 }
 </script>

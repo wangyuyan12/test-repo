@@ -3,7 +3,6 @@
 		position: relative;
 		overflow: hidden;
 		width: 100%;
-		height: 341px;
 		.sliders {
 			width: 99999999px;
 			transition: all .5s;
@@ -45,14 +44,14 @@
 </style>
 
 <template>
-	<div class="slider-wrapper" v-el:wrapper 
+	<div class="slider-wrapper"
 		@touchstart ='changeImgStart'
 		@touchmove="changeImgMove"
-		@touchend="changeImgEnd">
-		<div class="sliders clearfix" v-el:sliders>
+		@touchend="changeImgEnd" v-el:wrapper>
+		<div class="sliders clearfix" :style="{height: sliderHeight + 'px'}" v-el:sliders>
 			<slot></slot>
 		</div>
-		<ul class="slider-nav" v-el:circles>
+		<ul class="slider-nav" :style="{display: displayNav}" v-el:circles>
 			<li v-for='n in count'>
 				<span class="circle" :class="{'active': n === current }"></span>
 			</li>
@@ -75,6 +74,7 @@ export default {
 		return {
 			current: 0,
 			sliderWidth: 0,
+			sliderHeight: 0,
 			sliders: null,
 			imgs: null,
 			imgWidth: 0,
@@ -83,6 +83,7 @@ export default {
 			intervalFlag: null,
 			startX: 0,
 			offsetX: 0,
+			displayNav: 'block',
 		}
 	},
 
@@ -100,7 +101,6 @@ export default {
 		},
 		changeImgEnd(e) {
 			e.preventDefault()
-			console.log('offsetX:', this.offsetX)
 			if(this.offsetX === 0) {
 				this.imgs[this.current].click()
 			} else if(this.offsetX < -150) {
@@ -112,7 +112,6 @@ export default {
 			this.autoPlay()
 		},
 		changeImgs(index) {
-			console.log('in changeImgs', index)
 			if(index === 'next') {
 				this.current ++
 			} else if(index === 'pre') {
@@ -129,14 +128,18 @@ export default {
 	},
 
 	ready() {
-		console.log('in ready')
 		this.sliderWidth = this.$els.wrapper.parentNode.clientWidth
-		let sliderHeight = this.$els.wrapper.parentNode.clientHeight
+		this.sliderHeight = this.$els.wrapper.parentNode.clientHeight
 		this.sliders = this.$els.sliders
 		this.imgs = this.sliders.getElementsByTagName('img')
 		for( let i=0; i<this.imgs.length; i++) {  //重置图片尺寸
 			this.imgs[i].style.width = this.sliderWidth + 'px'
-			this.imgs[i].style.height = sliderHeight + 'px'
+			this.imgs[i].style.height = this.sliderHeight + 'px'
+		}
+
+		if(this.imgs.length === 1) {
+			this.displayNav = 'none'
+			return
 		}
 		this.$els.circles.style.width = this.count * 20 + 'px'	 //小园点
 		this.sliders.style.width = (this.count * this.sliderWidth) + 'px' //slider总宽度

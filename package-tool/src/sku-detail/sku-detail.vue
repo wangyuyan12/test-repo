@@ -10,13 +10,9 @@
 		position: relative;
 	}
 	.sku-banner {
-		height: 305px;
+		height: 30.5rem;
 		width: 100%;
 		background-color: #d0d0d0;
-		.slider-img {
-			/* height: 305px;
-			width: 414px; */
-		}
 	}
 
 	.sku-head {
@@ -40,6 +36,16 @@
 			img {
 				margin-left: 10px;
 				height: 1.8rem;
+			}
+			.rate {
+				display: inline-block;
+				background: url('./resource/rate-back.png');
+				background-size: 100% 100%;
+				margin-left: 10px;
+				line-height: 1.8rem;
+				color: #fff;
+				font-size: 1.2rem;
+				padding: 0 5px 0;
 			}
 		}
 	}
@@ -158,10 +164,10 @@
 			transition='leaveshow'
 			v-if='isPageOne'>
 			<div class='sku-banner'>
-				<slider :count='3' :interval='3000'>
+				<slider :count='imgNum' :interval='3000'>
 					<div class="slider" v-for='item in imgs'>
-						<a :href="item.goto_url">
-							<img class="slider-img" :src="item.img_url">
+						<a :href="">
+							<img class="slider-img" :src="item.ad_pic">
 						</a>
 					</div>
 				</slider>
@@ -170,22 +176,22 @@
 				<div class="sku-name"><span>{{ skuName }}</span></div>
 				<div class="sku-price">
 					<span>￥</span>
-					<span class='price-inter-part'>20</span>
-					<span class='price-decimal-part'>.00</span>
-					<img src="./resource/deposit.png" alt="deposit">
+					<span class='price-inter-part'>{{ priceInt}}</span>
+					<span class='price-decimal-part'>.{{ priceDeci }}</span>
+					<span class="rate">支付订金{{ rate }}%</span>
 				</div>
 			</div>
 			<div class="sku-info">
 				<p>
-					<span class="info-left">规格： {{ specs }}</span>
-					<span class="info-right">库存数量： {{ stock }}</span>
+					<span class="info-left">规格:&nbsp;&nbsp;{{ specs }}</span>
+					<span class="info-right">库存数量:&nbsp;&nbsp;{{ stock }}</span>
 				</p>
 				<p>
-					<span class="info-left">剂型: {{ dosageForm }}</span>
-					<span class="info-right">销售控制: {{ sellCtl }}</span>
+					<span class="info-left">剂型:&nbsp;&nbsp;{{ dosageForm }}</span>
+					<span class="info-right">销售控制:&nbsp;&nbsp;{{ limit }}</span>
 				</p>
 				<p>
-					<span class="info-left">单位: {{ unit }}</span>
+					<span class="info-left">单位:&nbsp;&nbsp;{{ unit }}</span>
 				</p>
 			</div>
 			<div id='show-more' class="show-more" 
@@ -214,30 +220,30 @@
 						<span>产品详情</span>
 					</div>
 					<div class="content-intro">
-						<span> {{ contentIntro }} </span>
+						<span> {{ adMsg }} </span>
 					</div>
 				</div>
 				<div class="prod-param" v-else>
 					<p>
-						<span class="intro-left">规格： {{ specs }}</span>
-						<span class="intro-right">剂型： {{ dosageForm }}</span>
+						<span class="intro-left">规格:&nbsp;&nbsp;{{ specs }}</span>
+						<span class="intro-right">剂型:&nbsp;&nbsp;{{ dosageForm }}</span>
 					</p>
 					<p>
-						<span class="intro-left">中包数量： {{ midBag }}</span>
-						<span class="intro-right">整件数量： {{ largeBag }}</span>
+						<span class="intro-left">中包数量:&nbsp;&nbsp;{{ midBag }}</span>
+						<span class="intro-right">整件数量:&nbsp;&nbsp;{{ largeBag }}</span>
 					</p>
 					<p>
-						<span class="intro-left">单位： {{ unit }}</span>
-						<span class="intro-right">是否医保： {{ isMdeCare }}</span>
+						<span class="intro-left">单位:&nbsp;&nbsp;{{ unit }}</span>
+						<span class="intro-right">是否医保:&nbsp;&nbsp;{{ isMedCare }}</span>
 					</p>
 					<p>
-						批准文号： {{ license }}
+						批准文号:&nbsp;&nbsp;{{ license }}
 					</p>
 					<p>
-						生产企业： {{ factory }}
+						生产企业:&nbsp;&nbsp;{{ factory }}
 					</p>
 					<p>
-						商业公司： {{ businessComp }}
+						商业公司:&nbsp;&nbsp;{{ company }}
 					</p>
 				</div>
 			</div>
@@ -250,8 +256,9 @@
 </template>
 
 <script>
+import fetch from 'isomorphic-fetch'
 import slider from './slider.vue'
-	
+
 export default {
 	name: 'skuDetail',
 
@@ -263,26 +270,30 @@ export default {
 		return {
 			showMoreHeight: window.innerHeight - 560,
 			conthHeight: window.innerHeight - 120,
-			skuName: '阿司匹林泡腾片（巴米尔）',
-			specs: '0.25g*20包',
-			stock: '2000000盒',
-			dosageForm: '颗粒',
-			sellCtl: '拆零',
-			unit: '盒',
-			midBag: '10盒',
-			largeBag: '100盒',
-			isMdeCare: '是',
-			license: '国药准字号Z23032102341',
-			factory: '杭州天猪科技有限公司',
-			businessComp: '宁波天猪科技有限公司',
-			contentIntro: 'when i was young i\'d listen to the radio waiting for my favorite songs when they played i\'d sing along,it make me smile. those were such happy times and not so long ago how i wondered where they\'d gone. but they\'re back again just like a long lost friend all the songs i love so well.every shalala every wo\'wo',
+			skuId: null,
+			skuName: '--',
+			priceInt: '00',
+			priceDeci: '00',
+			rate: 0,
+			specs: '--',
+			stock: '--',
+			dosageForm: '--',
+			limit: '--',
+			unit: '--',
+			midBag: '--',
+			largeBag: '--',
+			isMedCare: '--',
+			license: '--',
+			factory: '--',
+			company: '--',
+			adMsg: '--',
 			isProdCont: true,
 			isPageOne: true,
 			startY: 0,
 			offsetY: 0,
-			imgs: [{goto_url: 'http://www.baidu.com', img_url: 'http://image.iqing.in/recommend/613890e9-3e5d-4acd-afae-003201e1d86d.jpg-cover'},
-					{goto_url: 'http://www.baidu.com', img_url: 'http://image.iqing.in/recommend/11576c83-d543-46e9-9725-89125bd066c2.jpg-cover'},
-					{goto_url: 'http://www.ifeng.com', img_url: 'http://image.iqing.in/recommend/21bd4d0d-19cb-44a5-8946-8ddfc7326ee2.jpg-cover'}]
+			imgs: [{ad_pic: 'http://image.iqing.in/recommend/613890e9-3e5d-4acd-afae-003201e1d86d.jpg-cover'},
+					{ad_pic: 'http://image.iqing.in/recommend/11576c83-d543-46e9-9725-89125bd066c2.jpg-cover'},
+					{ad_pic: 'http://image.iqing.in/recommend/21bd4d0d-19cb-44a5-8946-8ddfc7326ee2.jpg-cover'}],
 		}
 	},
 
@@ -330,8 +341,53 @@ export default {
 			e.preventDefault()
 			document.getElementById('page-two').style.top = 0 + 'px'
 		}
+	},
 
+	ready() {
+		console.log('in ready')
+		let csrftoken = document.cookie.match(/csrftoken=\w+/ig)[0].replace(/csrftoken=/, '')
+		console.log('csrftoken', csrftoken)
+		let vm = this
+		fetch('http://localhost:8000/purchase/api/m/skuonline/detail/15410?area=12569', {
+			method: 'GET',
+			credentials: 'include',
+			headers: {
+				'X-CSRFTOKEN': csrftoken,
+			}
+		}).then(function(res){
+			if(res.ok) {
+				res.json().then(function(resp) {
+					vm.skuName = resp.sku.name || '--'
+					console.log('price', resp)
+					vm.priceInt = resp.online_area.price.split('.')[0] || '--'
+					vm.priceDeci = resp.online_area.price.split('.')[1] || '--'
+					vm.specs = resp.sku.specs || '--'
+					vm.dosageForm = resp.sku.dosage_form || '--'
+					vm.unit = resp.unit || '--'
+					vm.rate = parseFloat(resp.rate) * 100 || 0
+					vm.limit = resp.limit === 1 ? '中包' : (resp.limit === 2 ? '整件' : '拆零')
+					vm.imgs = resp.sku.pics
+					vm.stock = resp.sku_stock.stock
+					vm.adMsg = resp.sku.ad_msg
+					vm.midBag = resp.middle
+					vm.largeBag = resp.package
+					vm.isMedCare = resp.sku_pro.yibao ? '是' : '否'
+					vm.license = resp.license
+					vm.factory = resp.sku.factory
+					vm.company = resp.online_area.company.name
+				})
+			}
+		}).catch((err) => {
+			console.log('err', err)
+		})
+	},
+	computed: {
+		imgNum: function() {
+			console.log('pic', this.imgs[0].ad_pic)
+			return this.imgs.length
+		}
 	}
+
 }
 
 </script>

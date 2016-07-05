@@ -4,9 +4,7 @@ import $ from 'jquery'
 
 $(() => {
 	let csrftoken = document.cookie.match(/csrftoken=\w+/ig)[0].replace(/csrftoken=/, '')
-	console.log('csrftoken: ', csrftoken)
 	let skuId = /add\/\d+/.exec(location.href)[0].replace('add\/', '')
-	console.log('skuId', skuId)
 	let rendSku = (sku) => {
 		return '<img src=' + sku.pic + '>'
 				+ '<div class="prod-intro">'
@@ -213,7 +211,6 @@ $(() => {
 		let areaUnit = $(this).parents('.area-unit').clone(true)
 		$(areaUnit).find('.del-area').css('display', 'block')
 		areaUnit.appendTo('#area-list')
-		console.log($('.area-unit').clone(true).toString())
 	})
 	$('.del-area').click(function() {
 		$(this).parents('.area-unit').remove()
@@ -221,7 +218,6 @@ $(() => {
 	$('#btn-sub').click(() => {
 		let node = $('#area-list').children()
 		let applyInfos = getApplyInfo()
-		console.log('applyInfos: ', applyInfos)
 		if(applyInfos) {
 			subApply(applyInfos, skuId)
 		}

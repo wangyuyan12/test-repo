@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Vue.js HN Clone</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+  </head>
+  <body>
+    <div id="app1" class="app-{{ attrtest }}">
+      {{ message }}
+      {{{ htmlseg }}}
+      <h2>number: {{ a + 2 }}</h2>
+      <p v-if='h'>v-if tests</p>
+      <input v-model='inputval'>
+      <p>input value: {{ outval }}</p>
+      <br>
+      <h4>style</h4>
+      <p class='static' :class="classObj">v-bind class</p>
+      <p class="static2" :style="{ color: activeColor, fontSize: fontSize + 'px' }">v-bind style</p>
+      <br>
+      <h4>V-IF</h4>
+      <p v-if='ifTest'>if is true</p>
+      <p v-else>if is false</p>
+      <template v-='ifTest'>
+        <p>template</p>
+        <p>if is true</p>
+      </template>
+      <br>
+      <h4>V-FOR</h4>
+      <ul id='forex1'>
+        <li v-for="item in items">
+          {{ parentMessage }} - {{ $index }} - {{ item.message }}
+        </li>
+      </ul>
+      
+      <ul id='forex2'>
+        <template v-for='item in items'>
+          <li> template: {{ $index }}</li>
+          <li> template: {{ item.message }}</li>
+        </template>
+      </ul>
+
+      <h4>V-ON</h4>
+      <div id='von'>
+        <button @click="greet">Greet</button>
+        <button @click="say('hello vue.js', $event)">Say</button>
+      </div>
+
+      <form>
+        <input type="submit" value="submit" @submit.prevent="onSubmit">
+      </form>
+      
+      <h4>SELECT FORM</h4>
+      <span>Message is: {{ message2 }}</span><br>
+      <input type="text" v-model='message2' placeholder="Edit Me">
+
+      <h4>CHECKBOX</h4>
+      <input type="checkbox" id='jack' value="Jack" v-model='checkedNames'>
+      <label for="jack">Jack</label>
+      <input type="checkbox" id='john' value="John" v-model='checkedNames'>
+      <label for="john">John</label>
+      <input type="checkbox" id='mike' value="Mike" v-model='checkedNames'>
+      <label for="mike">Mike</label>
+      <input type="checkbox" id='smith' value="Smith" v-model='checkedNames'>
+      <label for="smith">Smith</label>
+      <br>
+      <span>Checked names: {{ checkedNames  }}</span>
+
+      <h4>RADIO</h4>
+      <input type="radio" id='one' value="One" v-model='picked'>
+      <label for="one">One</label>
+      <br>
+      <input type="radio" id="two" value="Two" v-model='picked'>
+      <label for="two">Two</label>
+      <br>
+      <span>Picked: {{ picked }}</span>
+      
+      <h4>SELECT</h4>
+      <select v-model='selected'>
+        <option v-for='option in options' :value="option.value">
+          {{ option.text }}
+        </option>
+      </select>
+      <span>Selected: {{ selected }}</span>
+
+      <br>
+      <br>
+      <br>
+    </div>
+    <div id='app2'>
+      <p>{{ message }}</p>
+      <input v-model='message'/>
+    </div>
+    <div id='app3'> 
+      <ul>
+        <li v-for='todo in todos'>
+          {{ todo.text }}
+        </li>
+      </ul>
+    </div>
+    <div id='app4'>
+      <input v-model='newTodo' v-on:keyup.enter='addTodo'>
+      <ul>
+        <li v-for='todo in todos'>
+          <span>{{ todo.text }}</span>
+          <button v-on:click='removeTodo($index)'>X</button>
+        </li>
+      </ul>
+    </div>
+    <script src="/static/starter/index.bundle.js"></script>
+  </body>
+</html>
