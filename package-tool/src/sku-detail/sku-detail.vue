@@ -1,4 +1,13 @@
 <style lang='less'>
+
+	.fn-clear::after {
+	    display: block;
+	    font-size: 0;
+	    height: 0;
+	    visibility: hidden;
+	    clear: both;
+	    content: " ";
+	}
 	.sku-detail {
 		width: 100%;
 		position: relative;
@@ -39,7 +48,7 @@
 			}
 			.rate {
 				display: inline-block;
-				background: url('./resource/rate-back.png');
+				background: url('/static/classic/purchase/resource/rate-back.png');
 				background-size: 100% 100%;
 				margin-left: 10px;
 				line-height: 1.8rem;
@@ -131,11 +140,79 @@
 			}
 		}
 	}
+	.cart-operate {
+		position: fixed;
+		bottom: 5rem;
+		z-index: 998;
+		background-color: #fff;
+		width: 100%;
+		height: 17rem;
+		text-align: center;
+		p {
+			margin: 15px;
+			.check-cart {
+				float: left;
+				font-size: 1.4rem;
+				text-decoration: none;
+				color: #2fb2fa;
+			}
+			.close {
+				display: inline-block;
+				float: right;
+				width: 1.5rem;
+				height: 1.5rem;
+				background: url('/static/classic/purchase/resource/close.png');
+				background-size: 100% 100%;
+			}
+		}
+
+		.num-operate {
+			line-height: 7rem;
+			font-size: 1.6rem;
+			color: #323232;
+			.num-cunt {
+				display: inline-block;
+				vertical-align: middle;
+				height: 4rem;
+				border: 1px solid #d9d9d9;
+				border-radius: 4px;
+				width: 14.5rem;
+				.sub {
+					display: inline-block;
+					height: 100%;
+					width: 3.8rem;
+					float: left;
+					border-right: 1px solid #d9d9d9;
+					background: url('/static/classic/purchase/resource/add-sub.png');
+					background-size: 200% 100%;
+					background-position: 100%;
+				}
+				.add {
+					display: inline-block;
+					height: 100%;
+					width: 3.8rem; 
+					float: right;
+					border-left: 1px solid #d9d9d9;
+					background: url('/static/classic/purchase/resource/add-sub.png');
+					background-size: 200% 100%;
+					background-position: 0;
+				}
+				.num {
+					line-height: 4rem;
+					width: 46%;
+					float: left;
+					font-size: 1.5rem;
+				}
+
+			}
+		}
+
+	}
 
 	.add-cart {
 		position: fixed;
 		bottom: 0px;
-		height: 50px;
+		height: 5rem;
 		width: 100%;
 		z-index: 999;
 		button {
@@ -148,12 +225,30 @@
 			font-weight: 600;
 		}
 	}
-
+	.cover {
+		position: fixed;
+		width: 100%;
+		height: 100%;
+		background-color: #000;
+		top: 0;
+		left: 0;
+		z-index: 990;
+		opacity: 0.15;
+		display: none;
+	}
+	
 	.leaveshow-transition {
 		transition: .5s ease-in-out;
 	}
 	.leaveshow-enter, .leaveshow-leave {
 		opacity: 0;
+	}
+
+	.showcart-transition {
+		transition: .5s ease-in-out;
+	}
+	.showcart-enter, .showcart-leave {
+		bottom: -12rem;
 	}
 
 </style>
@@ -248,9 +343,23 @@
 				</div>
 			</div>
 		</div>
-		<div class="add-cart">
-			<button>加入购物车</button>
+		<div v-if='cartStatus' class="cart-operate" transition="showcart">
+			<p class="fn-clear">
+				<a href="" class="check-cart">查看购物车</a>
+				<span class="close" @click="closeCart"></span>
+			</p>
+			<span class="num-operate fn-clear" >采购数量：
+				<span class="num-cunt">
+					<span class="sub" @click="subNum"></span>
+					<span class="num">{{ addCartNum }}</span>
+					<span class="add" @click="addNum"></span>
+				</span>
+			</span>
 		</div>
+		<div class="add-cart">
+			<button @click="addCart">{{ cartStatus ? "确定" : '加入购物车' }}</button>
+		</div>
+		<div class="cover" :style="{display: cartStatus ? 'block' : 'none'}"></div>
 	</div>
 	
 </template>
@@ -294,6 +403,9 @@ export default {
 			imgs: [{ad_pic: 'http://image.iqing.in/recommend/613890e9-3e5d-4acd-afae-003201e1d86d.jpg-cover'},
 					{ad_pic: 'http://image.iqing.in/recommend/11576c83-d543-46e9-9725-89125bd066c2.jpg-cover'},
 					{ad_pic: 'http://image.iqing.in/recommend/21bd4d0d-19cb-44a5-8946-8ddfc7326ee2.jpg-cover'}],
+			addCartNum: 0,
+			cartStatus: false, //false: 加入购物车; true: 确定
+
 		}
 	},
 
@@ -340,7 +452,22 @@ export default {
 		touchEndP2(e) {
 			e.preventDefault()
 			document.getElementById('page-two').style.top = 0 + 'px'
+		},
+		addCart() {
+			this.cartStatus = true
+		},
+		closeCart() {
+			this.cartStatus = false
+		},
+		addNum() {
+			this.addCartNum = this.addCartNum + 1
+		},
+		subNum() {
+			if(this.addCartNum > 0) {
+				this.addCartNum = this.addCartNum - 1
+			}
 		}
+
 	},
 
 	ready() {
@@ -383,9 +510,16 @@ export default {
 	},
 	computed: {
 		imgNum: function() {
-			console.log('pic', this.imgs[0].ad_pic)
 			return this.imgs.length
-		}
+		},
+		/*addCartBtn: function() {
+			if(this.addCartNum > 0) {
+				return '确定'
+			} else {
+				return '加入购物车'
+			}
+		}*/
+
 	}
 
 }

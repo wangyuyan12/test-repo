@@ -198,7 +198,6 @@
 						<span>{{ returnNum }}</span>
 						<input type="button" @click="addNum" value="+">
 					</span>
-					
 				</span>
 				
 				 <br>
