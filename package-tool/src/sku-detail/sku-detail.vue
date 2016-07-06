@@ -519,6 +519,7 @@ export default {
 		}).then(function(res){
 			if(res.ok) {
 				res.json().then(function(resp) {
+					console.log('resp', resp)
 					vm.skuName = resp.sku.name || '--'
 					vm.priceInt = resp.online_area.price.split('.')[0] || '--'
 					vm.priceDeci = resp.online_area.price.split('.')[1] || '--'
@@ -529,7 +530,7 @@ export default {
 					vm.limit = resp.limit === 1 ? '中包' : (resp.limit === 2 ? '整件' : '拆零')
 					vm.imgs = resp.sku.pics
 					vm.stock = resp.sku_stock.stock
-					vm.adMsg =  '<p>feifei</p>' //resp.sku.ad_msg
+					vm.adMsg =  resp.sku.ad_msg
 					vm.midBag = resp.middle
 					vm.largeBag = resp.package
 					vm.isMedCare = resp.sku_pro.yibao ? '是' : '否'
