@@ -294,7 +294,7 @@
 				@touchstart ='touchStartP1'
 				@touchmove="touchMoveP1" 
 				@touchend="touchEndP1">
-				<img src="./resource/arrow.jpg">
+				<img src="/static/classic/purchase/resource/arrow.jpg">
 				<span>下拉显示更多</span>
 			</div>
 		</div>
@@ -314,8 +314,8 @@
 					<div class="content-head">
 						<span>产品详情</span>
 					</div>
-					<div class="content-intro">
-						<span> {{ adMsg }} </span>
+					<div class="content-intro" v-el:wordpic>
+						 {{ adMsg }} 
 					</div>
 				</div>
 				<div class="prod-param" v-else>
@@ -379,6 +379,7 @@ export default {
 		return {
 			showMoreHeight: window.innerHeight - 560,
 			conthHeight: window.innerHeight - 120,
+			csrftoken: '',
 			skuId: null,
 			skuName: '--',
 			priceInt: '00',
@@ -388,6 +389,7 @@ export default {
 			stock: '--',
 			dosageForm: '--',
 			limit: '--',
+			limitNum: 1,
 			unit: '--',
 			midBag: '--',
 			largeBag: '--',
@@ -432,9 +434,11 @@ export default {
 		touchEndP1(e) {
 			e.preventDefault()
 			document.getElementById('page-one').style.top = 0 + 'px'
+			this.$els.wordpic.innerHTML = this.adMsg  //渲染图文详情
+			return
 		},
 		touchStartP2(e) {
-			// e.preventDefault()
+			e.preventDefault()
 			let touch = e.touches[0]
 			this.startY = touch.pageY
 		},
@@ -452,19 +456,50 @@ export default {
 		touchEndP2(e) {
 			e.preventDefault()
 			document.getElementById('page-two').style.top = 0 + 'px'
+			return
 		},
 		addCart() {
-			this.cartStatus = true
+			
+			if(this.cartStatus) {
+				let param = [{id: this.skuId, num: this.addCartNum }]
+				param = JSON.stringify(param)
+				console.log(param)
+				fetch('/purchase/api/m/cart/', {
+					method: 'POST',
+					credentials: 'include',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-CSRFTOKEN': this.csrftoken,
+					},
+					body: param
+				}).then((res) => {
+					if(res.ok) {
+						res.json().then((resp) => {
+							if(resp.status === 200) {
+								console.log('cart add success')
+							} else {
+								alert('抱歉， 提交失败！')
+							}
+						})
+					}
+				}).catch((err) => {
+					alert('抱歉， 提交失败！')
+				})
+
+			} else {
+				this.cartStatus = true
+			}
+			
 		},
 		closeCart() {
 			this.cartStatus = false
 		},
 		addNum() {
-			this.addCartNum = this.addCartNum + 1
+			this.addCartNum = this.addCartNum + this.limitNum
 		},
 		subNum() {
-			if(this.addCartNum > 0) {
-				this.addCartNum = this.addCartNum - 1
+			if(this.addCartNum > this.limitNum) {
+				this.addCartNum = this.addCartNum - this.limitNum
 			}
 		}
 
@@ -472,20 +507,19 @@ export default {
 
 	ready() {
 		console.log('in ready')
-		let csrftoken = document.cookie.match(/csrftoken=\w+/ig)[0].replace(/csrftoken=/, '')
-		console.log('csrftoken', csrftoken)
+		this.skuId = /detail\/\d+/.exec(location.href)[0].replace('detail\/', '')
+		this.csrftoken = document.cookie.match(/csrftoken=\w+/ig)[0].replace(/csrftoken=/, '')
 		let vm = this
-		fetch('http://localhost:8000/purchase/api/m/skuonline/detail/15410?area=12569', {
+		fetch('/purchase/api/m/skuonline/detail/' + this.skuId, {
 			method: 'GET',
 			credentials: 'include',
 			headers: {
-				'X-CSRFTOKEN': csrftoken,
+				'X-CSRFTOKEN': this.csrftoken,
 			}
 		}).then(function(res){
 			if(res.ok) {
 				res.json().then(function(resp) {
 					vm.skuName = resp.sku.name || '--'
-					console.log('price', resp)
 					vm.priceInt = resp.online_area.price.split('.')[0] || '--'
 					vm.priceDeci = resp.online_area.price.split('.')[1] || '--'
 					vm.specs = resp.sku.specs || '--'
@@ -495,13 +529,15 @@ export default {
 					vm.limit = resp.limit === 1 ? '中包' : (resp.limit === 2 ? '整件' : '拆零')
 					vm.imgs = resp.sku.pics
 					vm.stock = resp.sku_stock.stock
-					vm.adMsg = resp.sku.ad_msg
+					vm.adMsg =  '<p>feifei</p>' //resp.sku.ad_msg
 					vm.midBag = resp.middle
 					vm.largeBag = resp.package
 					vm.isMedCare = resp.sku_pro.yibao ? '是' : '否'
 					vm.license = resp.license
 					vm.factory = resp.sku.factory
 					vm.company = resp.online_area.company.name
+					vm.limitNum = resp.limit_num
+					vm.addCartNum = resp.limit_num
 				})
 			}
 		}).catch((err) => {
