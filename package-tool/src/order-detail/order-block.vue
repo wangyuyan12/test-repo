@@ -92,54 +92,6 @@
 			margin-left: 20px;
 		}
 	}
-	.cover {
-		position: fixed;
-		width: 100%;
-		height: 100%;
-		background-color: #000;
-		top: 0;
-		left: 0;
-		z-index: 999;
-		opacity: 0.15;
-		display: none;
-	}
-	.phone-call {
-		position: fixed;
-		width: 100%;
-		height: 14rem;
-		top: 30%;
-		z-index: 1001;
-		.to-call {
-			margin: 0 auto 0;
-			width: 26rem;
-			height: 100%;
-			background-color: #fff;
-			border-radius: 4px;
-			text-align: center;
-			font-size: 1.6rem;
-			color: #000;
-			span {
-				line-height: 9.5rem;
-			}
-			.call-operate {
-				line-height: 4.5rem;
-				border-top: 1px solid #d9d9d9;
-				a {
-					display: inline-block;
-					text-decoration: none;	
-					width: 48%;
-					color: #000;
-				}
-
-				.call {
-					color: #30b2fb;
-					border-left: 1px solid #d9d9d9;
-				}
-			}			
-		}
-		
-		display: none;
-	}
 
 	.selected-false {
 		display: inline-block;
@@ -163,36 +115,31 @@
 	<div class="order-block">
 		<div class="prod-detail fn-clear">
 			
-			<span class="prod-name" @click="selectProd">
-				<div style="display: none">
-					<img v-if="selected" class="selected-true" src="./resource/selected.png">
-					<span v-else class="selected-false">&nbsp;</span>
-				</div>
-				
-			 	阿司匹林泡腾片（巴米尔）
-			</span><br>
+			<span class="prod-name">{{ orderInfo.sku.name }}</span><br>
 			<div class="prod-img">
-				<img src="./resource/prod-img.jpg" alt="">
-				<span>需审核</span>
+				<img :src="pic" alt="">
+				<span  :style="{display: verifyTag }">待审核</span>
 			</div>
 			<div class="prod-info">
-				<span class="detail">剂型：&nbsp;片剂</span>
-				<span class="detail">规格：&nbsp;0.1g</span> <br>
-				<span class="detail">单价：&nbsp;￥8.9</span>
-				<span class="detail">数量：&nbsp;200盒</span> <br>
+				<span class="detail">剂型：&nbsp;{{ orderInfo.sku.dosage_form }}</span>
+				<span class="detail">规格：&nbsp;{{ orderInfo.sku.specs }}</span> <br>
+				<span class="detail">单价：&nbsp;￥{{ orderInfo.price }}</span>
+				<span class="detail">数量：&nbsp;{{ orderInfo.num }}</span> <br>
 				<span class="sum">总计</span> <br>
 
-				<span phone="13212342345" @click="callFactory" class="factory" v-el:factorynum>
+				<span @click="callFactory" class="factory" v-el:factorynum>
 					<img src="./resource/phone.png" alt="">
-					厂家：&nbsp;杭州天猪科技有限公司
+					厂家：&nbsp;{{ orderInfo.sku.factory }}
 				</span>
-				<span class="sum">￥3600.00</span>
+				<span class="sum">￥{{ sum }}</span>
 			</div>
 		</div>
 		<div class="num-date">
-			<span>生产批号：&nbsp;12345678901234</span>
-			<span class="shelf-life">产品有效期：&nbsp;2016年8月15日</span>
+			<span>生产批号：&nbsp;{{ orderInfo.batch }}</span>
+			<span class="shelf-life">产品有效期：&nbsp;{{ orderInfo.expiry_time }}</span>
 		</div>
+
+		<!-- 样式在 roder-detial 中编写 -->
 		<div class="cover" :style="{display: showHide}"></div>
 		<div class="phone-call" :style="{display: showHide}">
 			<div class="to-call">
@@ -202,31 +149,42 @@
 					<a class="call" href="tel:{{ phone }}">通话</a>
 				</div>
 			</div>
-			
 		</div>
 	</div>
 </template>
 
 <script>
+import fetch from 'isomorphic-fetch'
+
 export default {
 	name: 'orderBlock',
+	props: {
+		'orderInfo': Object,
+	},
 	data: function() {
 		return {
-			phone: '',
+			phone: '12345',
 			showHide: 'none',
 			selected: true,
+			sum: 0,
+			pic: '//static.eyaos.com/images/no_product.png',
+			verifyTag: 'none',
 		}
 	},
 	methods: {
 		callFactory(e) {
 			this.showHide = 'block'
-			this.phone = this.$els.factorynum.getAttribute('phone')
-
 		},
 		cancelCall() {
 			this.showHide = 'none'
 		}
+	},
+	beforeCompile() {
+		this.sum = parseFloat( this.orderInfo.price ) * parseFloat( this.orderInfo.num )
+		this.pic = this.orderInfo.sku.pic ? this.orderInfo.sku.pic : '//static.eyaos.com/images/no_product.png'
+		this.verifyTag = this.orderInfo.sku_auth ? ( this.orderInfo.sku_auth.auth_state === 1 ? 'block' : 'none' ) : 'block'
 	}
+
 
 }
 

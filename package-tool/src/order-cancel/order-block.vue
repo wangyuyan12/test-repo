@@ -159,26 +159,26 @@
 	<div class="order-block">
 		<div class="prod-detail fn-clear">
 			
-			<span class="prod-name tz-no-wrap" @click="selectProd" :prod-id='prodInfo.id' v-el:skuname>
+			<span class="prod-name tz-no-wrap" @click="selectProd" :prod-id='orderInfo.sku.id' v-el:skuname>
 				<span class="select-icon" :style="{ backgroundPosition: selected ? '100%' : '200%' }"></span>
-				{{ prodInfo.name }}
+				{{ orderInfo.sku.name }}
 			</span><br>
 			<div class="prod-img">
-				<img src="./resource/prod-img.jpg" alt="">
-				<span :style="{display: prodInfo.verified ? 'block' : 'none' }">需审核</span>
+				<img :src="pic" alt="">
+				<span :style="{display: verifyTag }">需审核</span>
 			</div>
 			<div class="prod-info">
-				<span class="detail">剂型：&nbsp;{{ prodInfo.dosage_form }}</span>
-				<span class="detail">规格：&nbsp;{{ prodInfo.specs }}</span> <br>
-				<span class="detail">单价：&nbsp;￥{{ prodInfo.price }}</span>
-				<span class="detail">数量：&nbsp;{{ prodInfo.num }}</span> <br>
+				<span class="detail">剂型：&nbsp;{{ orderInfo.sku.dosage_form }}</span>
+				<span class="detail">规格：&nbsp;{{ orderInfo.sku.specs }}</span> <br>
+				<span class="detail">单价：&nbsp;￥{{ orderInfo.price }}</span>
+				<span class="detail">数量：&nbsp;{{ orderInfo.num }}</span> <br>
 				<span class="sum">总计</span> <br>
 
 				<span phone="13212342345" @click="callFactory" class="factory tz-no-wrap" v-el:factorynum>
 					<img src="./resource/phone.png" alt="">
-					厂家：&nbsp;{{ prodInfo.factory }}
+					厂家：&nbsp;{{ orderInfo.sku.factory }}
 				</span>
-				<span class="sum">￥{{ prodInfo.money }}</span>
+				<span class="sum">￥{{ sum }}</span>
 			</div>
 		</div>
 		<div class="num-date" style="display: none">
@@ -204,13 +204,16 @@
 export default {
 	name: 'orderBlock',
 	props: {
-		'prodInfo': Object,
+		'orderInfo': Object,
 	},
 	data: function() {
 		return {
 			phone: '',
 			showHide: 'none',
 			selected: false,
+			pic: '//static.eyaos.com/images/no_product.png',
+			verifyTag: 'none',
+			sum: '--',
 		}
 	},
 	methods: {
@@ -238,6 +241,11 @@ export default {
 				this.selected = false
 			}
 		}
+	},
+	beforeCompile() {
+		this.sum = parseFloat( this.orderInfo.price ) * parseFloat( this.orderInfo.num )
+		this.pic = this.orderInfo.sku.pic ? this.orderInfo.sku.pic : '//static.eyaos.com/images/no_product.png'
+		this.verifyTag = this.orderInfo.sku_auth ? ( this.orderInfo.sku_auth.auth_state === 1 ? 'block' : 'none' ) : 'block'
 	},
 
 }

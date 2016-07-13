@@ -185,7 +185,7 @@
 					border-right: 1px solid #d9d9d9;
 					background: url('/static/classic/purchase/resource/add-sub.png');
 					background-size: 200% 100%;
-					background-position: 100%;
+					background-position: 0;
 				}
 				.add {
 					display: inline-block;
@@ -195,11 +195,11 @@
 					border-left: 1px solid #d9d9d9;
 					background: url('/static/classic/purchase/resource/add-sub.png');
 					background-size: 200% 100%;
-					background-position: 0;
+					background-position: 100%;
 				}
 				.num {
 					line-height: 4rem;
-					width: 46%;
+					width: 45%;
 					float: left;
 					font-size: 1.5rem;
 				}
@@ -463,7 +463,6 @@ export default {
 			if(this.cartStatus) {
 				let param = [{id: this.skuId, num: this.addCartNum }]
 				param = JSON.stringify(param)
-				console.log(param)
 				fetch('/purchase/api/m/cart/', {
 					method: 'POST',
 					credentials: 'include',
@@ -485,6 +484,7 @@ export default {
 				}).catch((err) => {
 					alert('抱歉， 提交失败！')
 				})
+				this.cartStatus = false
 
 			} else {
 				this.cartStatus = true
@@ -506,7 +506,6 @@ export default {
 	},
 
 	ready() {
-		console.log('in ready')
 		this.skuId = /detail\/\d+/.exec(location.href)[0].replace('detail\/', '')
 		this.csrftoken = document.cookie.match(/csrftoken=\w+/ig)[0].replace(/csrftoken=/, '')
 		let vm = this
@@ -519,7 +518,6 @@ export default {
 		}).then(function(res){
 			if(res.ok) {
 				res.json().then(function(resp) {
-					console.log('resp', resp)
 					vm.skuName = resp.sku.name || '--'
 					vm.priceInt = resp.online_area.price.split('.')[0] || '--'
 					vm.priceDeci = resp.online_area.price.split('.')[1] || '--'
@@ -549,13 +547,6 @@ export default {
 		imgNum: function() {
 			return this.imgs.length
 		},
-		/*addCartBtn: function() {
-			if(this.addCartNum > 0) {
-				return '确定'
-			} else {
-				return '加入购物车'
-			}
-		}*/
 
 	}
 

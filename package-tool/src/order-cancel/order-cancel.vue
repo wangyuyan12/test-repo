@@ -35,15 +35,13 @@
 		vertical-align: middle;
 	}
 
-	
-
 </style>
 
 <template>
 	<div class="page-wrapper">
 		<div class="order-list">
-			<div v-for="prod in prods">
-				<order-block :prod-info="prod"></order-block>
+			<div v-for="order in orders">
+				<order-block :order-info="order"></order-block>
 			</div >
 		</div>
 		<div class="footbar">
@@ -54,7 +52,7 @@
 				</span> 
 				<span class="text">全选</span>
 			</span>
-			<span class="order-operate" :style="{backgroundColor: enabelCancel ? '#30b3fb' : '#d9d9d9'}">取消所选药品</span>
+			<span class="order-operate" :style="{backgroundColor: enabelCancel ? '#30b3fb' : '#d9d9d9'}" @click="cancelSkus">取消所选药品</span>
 		</div>
 	</div>
 	
@@ -72,63 +70,35 @@ export default {
 
 	data: function() {
 		return {
-			prods: [
-				{
-					id: '1234',
-					name: '1谷胱甘太谷胱甘太谷胱甘太',
-					dosage_form: '1片剂',
-					specs: '0.1g',
-					num: '200盒',
-					factory: '杭州天猪科技有限公司',
-					price: '8',
-					money: 3000,
-					verified: true,
-				},
-				{
-					id: '1235',
-					name: '2谷胱甘太谷胱甘太谷胱甘太',
-					dosage_form: '2片剂',
-					specs: '0.18g',
-					num: '200盒',
-					factory: '杭州天猪科技有限公司',
-					price: '8.1',
-					money: 3500,
-					verified: false,
-				},
-				{
-					id: '1236',
-					name: '3谷胱甘太谷胱甘太谷胱甘太',
-					dosage_form: '3片剂',
-					specs: '0.19g',
-					num: '200盒',
-					factory: '杭州天猪科技有限公司',
-					price: '8.3',
-					money: 3600,
-					verified: false,
-				}
-			],
+			csrftoken: '',
+			orders: [],
 			selectdItem: [],  //选中的订单
 			selectAll: false,
-			// enabelCancel: false,  //取消
 		}
 	},
 	methods: {
 		selectAllProd() {
 			this.selectAll = !this.selectAll   //全选标签
-			// this.enabelCancel = this.selectAll  //“取消所选药品”使能控制
 			if(this.selectAll) {
-				for(let i=0; i<this.prods.length; i++) {
-					this.selectdItem.push(this.prods[i].id)  //
+				for(let i=0; i<this.orders.length; i++) {
+					this.selectdItem.push(this.orders[i].sku.id)  //
 				}
 				this.$broadcast('selectAllProd', 'selected')
 			} else {
 				this.selectdItem = []
 				this.$broadcast('selectAllProd', 'cancel')
 			}
+		},
+		cancelSkus() {
+			if(this.enabelCancel) {
+				console.log('skus', this.selectdItem)
+			}
+			
 		}
 	},
 	events: {
 		'selectedProd': function(prodId, operate) {
+			prodId = parseInt(prodId)
 			if(operate === 'add') {
 				this.selectdItem.push(prodId)
 			} else if(operate === 'del') {
@@ -139,8 +109,8 @@ export default {
 					}
 				}
 			}
-			// this.enabelCancel = this.selectdItem.length > 0 ? true : false  //“取消所选药品”使能控制
-			this.selectAll = this.selectdItem.length === this.prods.length  //
+			
+			this.selectAll = this.selectdItem.length === this.orders.length
 		}
 	},
 
@@ -149,6 +119,24 @@ export default {
 			return this.selectdItem.length > 0 ? true : false  //“取消所选药品”使能控制
 		}
 	},
+
+	ready() {
+		this.csrftoken = document.cookie.match(/csrftoken=\w+/ig)[0].replace(/csrftoken=/, '')
+		this.orderNum = /cancel\/\d+/.exec(location.href)[0].replace('cancel\/', '')
+		let vm = this
+		fetch('/purchase/api/order/' + this.orderNum, {
+			methods: 'GET',
+			credentials: 'include',
+			headers: {
+				'X-CSRFTOKEN': this.csrftoken,
+			}
+		}).then(function(res) {
+			res.json().then(function(resp) {
+				console.log('resp', resp)
+				vm.orders = resp.order_skus
+			})
+		})
+	}
 
 }
 </script>
