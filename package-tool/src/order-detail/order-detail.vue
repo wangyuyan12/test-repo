@@ -27,6 +27,7 @@
 		background-color: #fff;
 	}
 	.price-order {
+		margin-bottom: 4.5rem;
 		background-color: #fff;
 		padding: 12px 15px 18px;
 		line-height: 2rem;
@@ -135,7 +136,7 @@
 				<span class="contact-comp" @click="callCompany">联系商业公司</span>
 			</div>
 			<div v-if="footerMode === 1">
-				<a href="/purchase/m/order/cancel/{{orderNum}}"><span v-else class="other-status left">取消订单</span></a>
+				<a href="/purchase/m/order/cancel/{{orderId}}"><span v-else class="other-status left">取消订单</span></a>
 				<a href=""><span  class="other-status right">提交</span></a>
 				 <!-- //第一期 付款 改为 提交 -->
 			</div>
@@ -176,6 +177,7 @@ export default {
 		return {
 			csrftoken: '',
 			total: '--',
+			orderId: 0,
 			orderNum: '--',
 			companyName: '--',
 			createTime: '--',
@@ -197,16 +199,17 @@ export default {
 	},
 	ready() {
 		this.csrftoken = document.cookie.match(/csrftoken=\w+/ig)[0].replace(/csrftoken=/, '')
-		this.orderNum = /detail\/\d+/.exec(location.href)[0].replace('detail\/', '')
+		this.orderId = /detail\/\d+/.exec(location.href)[0].replace('detail\/', '')
 		let vm = this
-		fetch('/purchase/api/order/' + this.orderNum, {
-			methods: 'GET',
+		fetch('/purchase/api/order/' + this.orderId, {
+			method: 'GET',
 			credentials: 'include',
 			headers: {
 				'X-CSRFTOKEN': this.csrftoken,
 			}
 		}).then(function(res) {
 			res.json().then(function(resp) {
+				vm.orderNum = resp.number
 				vm.companyName = resp.company.name
 				vm.phone = resp.company.mobile
 				if(resp.order_state === 0) {
@@ -222,7 +225,7 @@ export default {
 				} else if(resp.order_state === 3) {
 					vm.statusName = '下单成功'
 					vm.footerDisp = 'block'
-					vm.footerMode = 0
+					vm.footerMode = 1
 				} else if(resp.order_state === 4) {
 					vm.statusName = '等待收货'
 					vm.footerDisp = 'block'

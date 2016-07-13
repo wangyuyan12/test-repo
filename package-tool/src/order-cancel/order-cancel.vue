@@ -54,11 +54,13 @@
 			</span>
 			<span class="order-operate" :style="{backgroundColor: enabelCancel ? '#30b3fb' : '#d9d9d9'}" @click="cancelSkus">取消所选药品</span>
 		</div>
+
 	</div>
 	
 </template>
 
 <script>
+import fetch from 'isomorphic-fetch'
 import orderBlock from './order-block.vue'
 
 export default {
@@ -71,6 +73,7 @@ export default {
 	data: function() {
 		return {
 			csrftoken: '',
+			orderId: 0,
 			orders: [],
 			selectdItem: [],  //选中的订单
 			selectAll: false,
@@ -80,6 +83,7 @@ export default {
 		selectAllProd() {
 			this.selectAll = !this.selectAll   //全选标签
 			if(this.selectAll) {
+				this.selectdItem = [] //清空
 				for(let i=0; i<this.orders.length; i++) {
 					this.selectdItem.push(this.orders[i].sku.id)  //
 				}
@@ -91,9 +95,33 @@ export default {
 		},
 		cancelSkus() {
 			if(this.enabelCancel) {
-				console.log('skus', this.selectdItem)
+				let param = {
+					all: this.selectAll,
+					sku_list: this.selectdItem,
+				}
+				
+				fetch('/purchase/api/shop/order/update/' + this.orderId, {
+					method: 'PATCH',
+					credentials: 'include',
+					headers: { 
+						'Content-Type': 'application/json',
+						'X-CSRFTOKEN': this.csrftoken,
+					},
+					body: JSON.stringify(param)
+				}).then((res) => {
+					res.json().then((resp) => {
+						console.log('resp', resp)
+						if(resp.status === 200) {
+							self.location = '/purchase/m/order/list/'
+						} else {
+							alert(resp.detail)
+						}
+					})
+				}).catch((err) => {
+					console.log('err', err)
+					alert('取消失败，请重试！')
+				})
 			}
-			
 		}
 	},
 	events: {
@@ -117,15 +145,16 @@ export default {
 	computed: {
 		enabelCancel: function() {
 			return this.selectdItem.length > 0 ? true : false  //“取消所选药品”使能控制
-		}
+		},
+
 	},
 
 	ready() {
 		this.csrftoken = document.cookie.match(/csrftoken=\w+/ig)[0].replace(/csrftoken=/, '')
-		this.orderNum = /cancel\/\d+/.exec(location.href)[0].replace('cancel\/', '')
+		this.orderId = /cancel\/\d+/.exec(location.href)[0].replace('cancel\/', '')
 		let vm = this
-		fetch('/purchase/api/order/' + this.orderNum, {
-			methods: 'GET',
+		fetch('/purchase/api/order/' + this.orderId, {
+			method: 'GET',
 			credentials: 'include',
 			headers: {
 				'X-CSRFTOKEN': this.csrftoken,

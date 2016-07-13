@@ -32,10 +32,11 @@
 		.prod-img {
 			position: relative;
 			float: left;
-			width: 20%;
+			width: 6.5rem;
+			height: 6.5rem;
 			img {
-				width:  6.5rem;
-				height:  6.5rem;
+				width: 100%;
+				height: 100%;
 			}
 			span {
 				display: block;
@@ -165,7 +166,7 @@
 			</span><br>
 			<div class="prod-img">
 				<img :src="pic" alt="">
-				<span :style="{display: verifyTag }">需审核</span>
+				<span :style="{display: verifyTag }">待审核</span>
 			</div>
 			<div class="prod-info">
 				<span class="detail">剂型：&nbsp;{{ orderInfo.sku.dosage_form }}</span>

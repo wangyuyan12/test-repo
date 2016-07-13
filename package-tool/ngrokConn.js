@@ -8,11 +8,14 @@ const ngrokConfig = require('./package.config').ngrokConfig
 let port = ngrokConfig.port
 let proto = ngrokConfig.proto
 let token = ngrokConfig.token
+let subDomain = ngrokConfig.subDomain
 
 
 let options = {
 	proto: proto,
 	addr: port,
+	subdomain: subDomain,
+	authtoken: token,
 }
 
 ngrok.authtoken(token, (err, token) => {
@@ -27,7 +30,7 @@ ngrok.authtoken(token, (err, token) => {
 ngrok.connect( options, (err, url) => {
 	if(err) {
 		console.log(colors.bgRed.bold('Failed to create connection'))
-		console.dir(colors.red(err))
+		console.log(err)
 	} else {
 		console.log(colors.yellow.bold.bgCyan(url + ' -> localhost:' + port))
 	}

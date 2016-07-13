@@ -26,10 +26,11 @@
 		.prod-img {
 			position: relative;
 			float: left;
-			width: 20%;
+			width: 6.5rem;
+			height: 6.5rem;
 			img {
-				width:  6.5rem;
-				height:  6.5rem;
+				width: 100%;
+				height: 100%;
 			}
 			span {
 				display: block;

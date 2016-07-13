@@ -21,6 +21,7 @@ var ngrokConfig= {
 	token: '68NcTtewq6VKaa7eiW5en_239XjYofPtNBEPKPRT8nJ',
 	port: 3000,
 	proto: 'http', // http|tcp|tls  (default： http)
+  subDomain: 'feifeiyuonpe'
 }
 
 
