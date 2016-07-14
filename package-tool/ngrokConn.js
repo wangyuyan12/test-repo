@@ -10,7 +10,6 @@ let proto = ngrokConfig.proto
 let token = ngrokConfig.token
 let subDomain = ngrokConfig.subDomain
 
-
 let options = {
 	proto: proto,
 	addr: port,

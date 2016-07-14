@@ -1,5 +1,5 @@
 <style lang="less">
-	.tz-no-wrap{
+	.no-wrap{
 		white-space: nowrap; 
 		text-overflow:ellipsis; 
 		-o-text-overflow:ellipsis; 
@@ -15,6 +15,7 @@
 	}
 	.order-block {
 		background-color: #fff;
+		margin-bottom: 2px;
 	}
 
 	.prod-detail {
@@ -24,9 +25,19 @@
 		background-color: #f5f5f5;
 		margin-bottom: 5px;
 		.prod-name {
+			display: inline-block;
 			line-height: 4rem;
 			font-size: 1.4rem;
+			width: 85%;
 			color: #333;
+		}
+		.prod-status {
+			position: absolute;
+			display: inline-block;
+			line-height: 4rem;
+			font-size: 1.2rem;
+			right: 15px;
+			color: #f78175;
 		}
 
 		.prod-img {
@@ -61,7 +72,7 @@
 			color: #999;
 			.detail {
 				display: inline-block;
-				width: 38%;
+				width: 43%;
 			}
 			.sum {
 				position: relative;
@@ -160,22 +171,24 @@
 	<div class="order-block">
 		<div class="prod-detail fn-clear">
 			
-			<span class="prod-name tz-no-wrap" @click="selectProd" :prod-id='orderInfo.sku.id' v-el:skuname>
-				<span class="select-icon" :style="{ backgroundPosition: selected ? '100%' : '200%' }"></span>
+			<span class="prod-name no-wrap" @click="selectProd" :prod-id='orderInfo.sku.id' v-el:skuname>
+				<span v-if="selectAble" class="select-icon" :style="{ backgroundPosition: selected ? '100%' : '200%' }"></span>
 				{{ orderInfo.sku.name }}
-			</span><br>
+			</span>
+			<span class="prod-status">{{ prodStatus }}</span>
+			<br>
 			<div class="prod-img">
 				<img :src="pic" alt="">
 				<span :style="{display: verifyTag }">待审核</span>
 			</div>
 			<div class="prod-info">
-				<span class="detail">剂型：&nbsp;{{ orderInfo.sku.dosage_form }}</span>
-				<span class="detail">规格：&nbsp;{{ orderInfo.sku.specs }}</span> <br>
-				<span class="detail">单价：&nbsp;￥{{ orderInfo.price }}</span>
-				<span class="detail">数量：&nbsp;{{ orderInfo.num }}</span> <br>
+				<span class="detail no-wrap">剂型：&nbsp;{{ orderInfo.sku.dosage_form }}</span>
+				<span class="detail no-wrap">规格：&nbsp;{{ orderInfo.sku.specs }}</span> <br>
+				<span class="detail no-wrap">单价：&nbsp;￥{{ orderInfo.price }}</span>
+				<span class="detail no-wrap">数量：&nbsp;{{ orderInfo.num }}</span> <br>
 				<span class="sum">总计</span> <br>
 
-				<span phone="13212342345" @click="callFactory" class="factory tz-no-wrap" v-el:factorynum>
+				<span @click="callFactory" class="factory tz-no-wrap" v-el:factorynum>
 					<img src="./resource/phone.png" alt="">
 					厂家：&nbsp;{{ orderInfo.sku.factory }}
 				</span>
@@ -212,34 +225,40 @@ export default {
 			phone: '',
 			showHide: 'none',
 			selected: false,
+			selectAble: true,
 			pic: '//static.eyaos.com/images/no_product.png',
 			verifyTag: 'none',
 			sum: '--',
+			prodStatus: '',
 		}
 	},
 	methods: {
-		callFactory(e) {
+		callFactory(e) {  //拨打厂家
 			this.showHide = 'block'
 			this.phone = this.$els.factorynum.getAttribute('phone')
 		},
 		cancelCall() {
 			this.showHide = 'none'
 		},
-		selectProd(e) {
-			this.selected = !this.selected
-			if(this.selected) {
-				this.$dispatch('selectedProd', this.$els.skuname.getAttribute('prod-id'), 'add')
-			} else {
-				this.$dispatch('selectedProd', this.$els.skuname.getAttribute('prod-id'), 'del')
+		selectProd(e) {  //选择商品
+			if(this.selectAble) {
+				this.selected = !this.selected
+				if(this.selected) {
+					this.$dispatch('selectedProd', this.$els.skuname.getAttribute('prod-id'), 'add')
+				} else {
+					this.$dispatch('selectedProd', this.$els.skuname.getAttribute('prod-id'), 'del')
+				}
 			}
 		}
 	},
 	events: {
-		selectAllProd: function(operate) {
-			if(operate === 'selected') {
-				this.selected = true
-			} else if(operate === 'cancel') {
-				this.selected = false
+		selectAllProd: function(operate) {  //父组件 broadcast 事件 -- 全选
+			if(this.selectAble) {
+				if(operate === 'selected') {
+					this.selected = true
+				} else if(operate === 'cancel') {
+					this.selected = false
+				}
 			}
 		}
 	},
@@ -247,6 +266,8 @@ export default {
 		this.sum = parseFloat( this.orderInfo.price ) * parseFloat( this.orderInfo.num )
 		this.pic = this.orderInfo.sku.pic ? this.orderInfo.sku.pic : '//static.eyaos.com/images/no_product.png'
 		this.verifyTag = this.orderInfo.sku_auth ? ( this.orderInfo.sku_auth.auth_state === 1 ? 'block' : 'none' ) : 'block'
+		this.prodStatus = this.orderInfo.state === 1 ? '' : (this.orderInfo.state === 2 ? '已取消' : '取消中')
+		this.selectAble = this.orderInfo.state === 1 ? true : false
 	},
 
 }

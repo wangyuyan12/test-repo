@@ -75,31 +75,34 @@ export default {
 			csrftoken: '',
 			orderId: 0,
 			orders: [],
-			selectdItem: [],  //选中的订单
+			selectedItem: [],  //选中的订单
+			selectAbleLength: 0,
 			selectAll: false,
 		}
 	},
 	methods: {
-		selectAllProd() {
+		selectAllProd() {  //全选/取消全选商品
 			this.selectAll = !this.selectAll   //全选标签
 			if(this.selectAll) {
-				this.selectdItem = [] //清空
+				this.selectedItem = [] //清空
 				for(let i=0; i<this.orders.length; i++) {
-					this.selectdItem.push(this.orders[i].sku.id)  //
+					if(this.orders[i].state === 1) {
+						this.selectedItem.push(this.orders[i].sku.id)  //
+					}
 				}
 				this.$broadcast('selectAllProd', 'selected')
 			} else {
-				this.selectdItem = []
+				this.selectedItem = []
 				this.$broadcast('selectAllProd', 'cancel')
 			}
 		},
-		cancelSkus() {
+		cancelSkus() {  //取消订单中产品
 			if(this.enabelCancel) {
 				let param = {
 					all: this.selectAll,
-					sku_list: this.selectdItem,
+					sku_list: this.selectedItem,
 				}
-				
+				//取消订单接口
 				fetch('/purchase/api/shop/order/update/' + this.orderId, {
 					method: 'PATCH',
 					credentials: 'include',
@@ -125,26 +128,26 @@ export default {
 		}
 	},
 	events: {
-		'selectedProd': function(prodId, operate) {
+		'selectedProd': function(prodId, operate) {  //子组件dispatch事件
 			prodId = parseInt(prodId)
 			if(operate === 'add') {
-				this.selectdItem.push(prodId)
+				this.selectedItem.push(prodId)
 			} else if(operate === 'del') {
-				for(let i=0; i<this.selectdItem.length; i++) {
-					if(this.selectdItem[i] === prodId) {
-						this.selectdItem.splice(i, 1)
+				for(let i=0; i<this.selectedItem.length; i++) {
+					if(this.selectedItem[i] === prodId) {
+						this.selectedItem.splice(i, 1)
 						break
 					}
 				}
 			}
 			
-			this.selectAll = this.selectdItem.length === this.orders.length
+			this.selectAll = this.selectedItem.length === this.selectAbleLength
 		}
 	},
 
 	computed: {
 		enabelCancel: function() {
-			return this.selectdItem.length > 0 ? true : false  //“取消所选药品”使能控制
+			return this.selectedItem.length > 0 ? true : false  //“取消所选药品”使能控制
 		},
 
 	},
@@ -153,6 +156,7 @@ export default {
 		this.csrftoken = document.cookie.match(/csrftoken=\w+/ig)[0].replace(/csrftoken=/, '')
 		this.orderId = /cancel\/\d+/.exec(location.href)[0].replace('cancel\/', '')
 		let vm = this
+		//加载订单详情
 		fetch('/purchase/api/order/' + this.orderId, {
 			method: 'GET',
 			credentials: 'include',
@@ -163,6 +167,11 @@ export default {
 			res.json().then(function(resp) {
 				console.log('resp', resp)
 				vm.orders = resp.order_skus
+				for(let i=0; i<vm.orders.length; i++) {
+					if(vm.orders[i].state === 1) {
+						vm.selectAbleLength += 1
+					}
+				}
 			})
 		})
 	}

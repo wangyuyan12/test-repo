@@ -8,8 +8,15 @@
 	    clear: both;
 	    content: " ";
 	}
+	.no-wrap{
+		white-space:nowrap; 
+		text-overflow:ellipsis; 
+		-o-text-overflow:ellipsis; 
+		overflow:hidden;
+	}
 	.order-block {
 		background-color: #fff;
+		margin-bottom: 2px;
 	}
 
 	.prod-detail {
@@ -18,9 +25,19 @@
 		padding-right: 15px;
 		background-color: #f5f5f5;
 		.prod-name {
+			display: inline-block;
 			line-height: 4rem;
 			font-size: 1.4rem;
+			width: 85%;
 			color: #333;
+		}
+		.prod-status {
+			position: absolute;
+			display: inline-block;
+			line-height: 4rem;
+			font-size: 1.2rem;
+			right: 15px;
+			color: #f78175;
 		}
 
 		.prod-img {
@@ -56,7 +73,7 @@
 			color: #999;
 			.detail {
 				display: inline-block;
-				width: 38%;
+				width: 43%;
 			}
 			.sum {
 				position: relative;
@@ -80,7 +97,7 @@
 		}
 	}
 
-	.num-date {
+	.batch-date {
 		margin-top: 2px;
 		margin-bottom: 5px;
 		background-color: #f5f5f5;
@@ -116,16 +133,18 @@
 	<div class="order-block">
 		<div class="prod-detail fn-clear">
 			
-			<span class="prod-name">{{ orderInfo.sku.name }}</span><br>
+			<span class="prod-name no-wrap">{{ orderInfo.sku.name }}</span>
+			<span class="prod-status">{{ prodStatus }}</span>
+			<br>
 			<div class="prod-img">
 				<img :src="pic" alt="">
 				<span  :style="{display: verifyTag }">待审核</span>
 			</div>
 			<div class="prod-info">
-				<span class="detail">剂型：&nbsp;{{ orderInfo.sku.dosage_form }}</span>
-				<span class="detail">规格：&nbsp;{{ orderInfo.sku.specs }}</span> <br>
-				<span class="detail">单价：&nbsp;￥{{ orderInfo.price }}</span>
-				<span class="detail">数量：&nbsp;{{ orderInfo.num }}</span> <br>
+				<span class="detail no-wrap">剂型：&nbsp;{{ orderInfo.sku.dosage_form }}</span>
+				<span class="detail no-wrap">规格：&nbsp;{{ orderInfo.sku.specs }}</span> <br>
+				<span class="detail no-wrap">单价：&nbsp;￥{{ orderInfo.price }}</span>
+				<span class="detail no-wrap">数量：&nbsp;{{ orderInfo.num }}</span> <br>
 				<span class="sum">总计</span> <br>
 
 				<span @click="callFactory" class="factory" v-el:factorynum>
@@ -135,7 +154,7 @@
 				<span class="sum">￥{{ sum }}</span>
 			</div>
 		</div>
-		<div class="num-date">
+		<div class="batch-date" v-if="showBatchDate">
 			<span>生产批号：&nbsp;{{ orderInfo.batch }}</span>
 			<span class="shelf-life">产品有效期：&nbsp;{{ orderInfo.expiry_time }}</span>
 		</div>
@@ -161,6 +180,7 @@ export default {
 	name: 'orderBlock',
 	props: {
 		'orderInfo': Object,
+		'orderStatus': Number,
 	},
 	data: function() {
 		return {
@@ -170,10 +190,12 @@ export default {
 			sum: 0,
 			pic: '//static.eyaos.com/images/no_product.png',
 			verifyTag: 'none',
+			prodStatus: '',  //未取消（不显示）， 取消中， 已取消
+			showBatchDate: false,
 		}
 	},
 	methods: {
-		callFactory(e) {
+		callFactory(e) {  //拨打厂家电话
 			this.showHide = 'block'
 		},
 		cancelCall() {
@@ -184,8 +206,9 @@ export default {
 		this.sum = parseFloat( this.orderInfo.price ) * parseFloat( this.orderInfo.num )
 		this.pic = this.orderInfo.sku.pic ? this.orderInfo.sku.pic : '//static.eyaos.com/images/no_product.png'
 		this.verifyTag = this.orderInfo.sku_auth ? ( this.orderInfo.sku_auth.auth_state === 1 ? 'block' : 'none' ) : 'block'
+		this.prodStatus = this.orderInfo.state === 1 ? '' : (this.orderInfo.state === 2 ? '已取消' : '取消中')
+		this.showBatchDate = this.orderStatus > 3 ? true : false  
 	}
-
 
 }
 

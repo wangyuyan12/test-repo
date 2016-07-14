@@ -102,7 +102,6 @@
 					width: 48%;
 					color: #000;
 				}
-
 				.call {
 					color: #30b2fb;
 					border-left: 1px solid #d9d9d9;
@@ -121,9 +120,8 @@
 		</div>
 		<div class="order-list">
 			<div v-for="order in orderSkus">
-				<order-block :order-info="order"></order-block>
+				<order-block :order-info="order" :order-status="orderStatus"></order-block>
 			</div>
-			
 		</div>
 		<div class="price-order">
 			<span class="sum">订单总额：&nbsp;￥{{ total }}</span><br>
@@ -179,6 +177,7 @@ export default {
 			total: '--',
 			orderId: 0,
 			orderNum: '--',
+			orderStatus: 0,
 			companyName: '--',
 			createTime: '--',
 			orderSkus: [],
@@ -190,10 +189,10 @@ export default {
 		}
 	},
 	methods: {
-		callCompany(e) {
+		callCompany(e) {  //拨打商业公司电话
 			this.showCall = 'block'
 		},
-		cancelCall() {
+		cancelCall() {  //取消拨打
 			this.showCall = 'none'
 		}
 	},
@@ -201,6 +200,7 @@ export default {
 		this.csrftoken = document.cookie.match(/csrftoken=\w+/ig)[0].replace(/csrftoken=/, '')
 		this.orderId = /detail\/\d+/.exec(location.href)[0].replace('detail\/', '')
 		let vm = this
+		//加载订单详情
 		fetch('/purchase/api/order/' + this.orderId, {
 			method: 'GET',
 			credentials: 'include',
@@ -209,8 +209,10 @@ export default {
 			}
 		}).then(function(res) {
 			res.json().then(function(resp) {
+				console.log('resp', resp)
 				vm.orderNum = resp.number
 				vm.companyName = resp.company.name
+				vm.orderStatus = resp.order_state
 				vm.phone = resp.company.mobile
 				if(resp.order_state === 0) {
 					vm.statusName = '未付款订单关闭'
