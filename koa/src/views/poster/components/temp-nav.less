@@ -1,0 +1,47 @@
+
+.nav-wrapper {
+	width: 100%;
+	height: 100%;
+
+	.temp-unit {
+		position: relative;
+		float: left;
+		margin: 3px;
+		border: 5px solid #53868B;
+		border-radius: 8px;
+		width: 30%;
+		height: 280px;
+		cursor: pointer;
+		img {
+			width: 100%;
+			height: 100%;
+		}
+		
+		.cover {
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 100;
+			background-color: #000;
+			opacity: .6;
+
+			a {
+
+				input {
+					margin-left: 40%;
+					margin-top: 60%;
+					height: 25px;
+					width: 40px;
+					border-radius: 4px;
+					background-color: #EEEED1;
+					
+					&:hover {
+						background-color: #00CD66;
+					}
+				}
+			}
+		}
+	}
+}

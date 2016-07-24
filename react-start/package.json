@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "test",
-    "deploy": "webpack --progress --colors"
+    "deploy": "export NODE_ENV='production' && webpack --progress --colors"
   },
   "keywords": [
     "react",
