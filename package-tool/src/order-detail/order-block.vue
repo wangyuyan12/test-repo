@@ -147,7 +147,7 @@
 				<span class="detail no-wrap">数量：&nbsp;{{ orderInfo.num }}</span> <br>
 				<span class="sum">总计</span> <br>
 
-				<span @click="callFactory" class="factory" v-el:factorynum>
+				<span v-if="orderInfo.enterprise.phone" @click="callFactory" class="factory" v-el:factorynum>
 					<img src="./resource/phone.png" alt="">
 					厂家：&nbsp;{{ orderInfo.sku.factory }}
 				</span>
@@ -163,7 +163,7 @@
 		<div class="cover" :style="{display: showHide}"></div>
 		<div class="phone-call" :style="{display: showHide}">
 			<div class="to-call">
-				<span>{{ phone }}</span> <br>
+				<span>{{ orderInfo.enterprise.phone }}</span> <br>
 				<div class="call-operate">
 					<a class="concel"  @click="cancelCall">取消</a>
 					<a class="call" href="tel:{{ phone }}">通话</a>
@@ -184,7 +184,6 @@ export default {
 	},
 	data: function() {
 		return {
-			phone: '12345',
 			showHide: 'none',
 			selected: true,
 			sum: 0,
