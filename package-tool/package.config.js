@@ -8,7 +8,7 @@ var configDir = {
   			 // './src/sku-detail/index.js',
   			 './src/order-detail/index.js',
          './src/order-cancel/index.js',
-         './src/goods-return/index.js',
+         './src/shop-refund/index.js',
          './src/refund-detail/index.js'
   			 ],
   outputDir: '/home/tzf/Documents/eyaos/eyaos_web/web/static/classic/purchase/'  //支持一个输出路径

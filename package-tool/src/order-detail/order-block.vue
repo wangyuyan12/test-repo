@@ -147,7 +147,7 @@
 				<span class="detail no-wrap">数量：&nbsp;{{ orderInfo.num }}</span> <br>
 				<span class="sum">总计</span> <br>
 
-				<span v-if="orderInfo.enterprise.phone" @click="callFactory" class="factory" v-el:factorynum>
+				<span @click="callFactory" class="factory" v-el:factorynum>
 					<img src="./resource/phone.png" alt="">
 					厂家：&nbsp;{{ orderInfo.sku.factory }}
 				</span>

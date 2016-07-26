@@ -386,7 +386,8 @@ export default {
 					sku: resp.sku,
 					price: resp.price,
 					num: resp.num,
-					phone: resp.enterprise.phone
+					phone: resp.enterprise.phone,
+					enterprise: resp.enterprise.name,
 				}]
 				vm.companyName = resp.company.name
 				vm.total = resp.total

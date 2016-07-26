@@ -182,17 +182,18 @@
 <template>
 	<div class="goods-block">
 		<div class="prod-detail fn-clear">
-			<span class="prod-name tz-no-wrap" @click="selectProd" :prod-id='prodInfo.id' v-el:skuname>
-				<span class="select-icon" :style="{ backgroundPosition: selected ? '100%' : '200%' }"></span>
-				{{ prodInfo.name }}
+			<span class="prod-name tz-no-wrap">
+				<!-- <span class="select-icon" :style="{ backgroundPosition: selected ? '100%' : '200%' }"></span> -->
+				{{ prodInfo.sku.name }}
 			</span><br>
 			<div class="prod-img">
-				<img src="./resource/prod-img.jpg" alt="">
-				<span :style="{display: prodInfo.verified ? 'block' : 'none' }">需审核</span>
+				<img :src="pic" alt="">
 			</div>
 			<div class="prod-info">
-				
-				<span class="detail">数量：
+				<span v-if="prodInfo.has_refund">
+					无法再次退货
+				</span>
+				<span v-else class="detail">数量：
 					<span class="num-cunt">
 						<input type="button" @click="subNum" value="-"> 
 						<span>{{ returnNum }}</span>
@@ -205,9 +206,9 @@
 
 				<span phone="13212342345" @click="callFactory" class="factory tz-no-wrap" v-el:factorynum>
 					<img src="./resource/phone.png" alt="">
-					厂家：&nbsp;{{ prodInfo.factory }}
+					厂家：&nbsp;{{ prodInfo.sku.factory }}
 				</span>
-				<span class="sum">￥{{ prodInfo.money }}</span>
+				<span class="sum">￥{{ sum }}</span>
 			</div>
 		</div>
 		<div class="num-date" style="display: none">
@@ -217,7 +218,7 @@
 		<div class="cover" :style="{display: showHide}"></div>
 		<div class="phone-call" :style="{display: showHide}">
 			<div class="to-call">
-				<span>{{ phone }}</span> <br>
+				<span>{{ prodInfo.enterprise.phone }}</span> <br>
 				<div class="call-operate">
 					<a class="concel"  @click="cancelCall">取消</a>
 					<a class="call" href="tel:{{ phone }}">通话</a>
@@ -234,12 +235,13 @@ export default {
 	props: {
 		'prodInfo': Object,
 	},
-	data: function() {
+	data() {
 		return {
 			phone: '',
 			showHide: 'none',
 			selected: false,
 			returnNum: 0,
+			sum: 0,
 		}
 	},
 	methods: {
@@ -250,32 +252,25 @@ export default {
 		cancelCall() {
 			this.showHide = 'none'
 		},
-		selectProd(e) {
-			this.selected = !this.selected
-			if(this.selected) {
-				this.$dispatch('selectedProd', this.$els.skuname.getAttribute('prod-id'), 'add')
-			} else {
-				this.$dispatch('selectedProd', this.$els.skuname.getAttribute('prod-id'), 'del')
-			}
-		},
 		addNum() {
-			this.returnNum = this.returnNum + 1
+			if(this.returnNum < this.prodInfo.num) {
+				this.returnNum = this.returnNum + 1
+				this.$dispatch('refundProd', {id: this.prodInfo.sku.id, num: this.returnNum})
+			} else {
+				alert('退货数量不能超过采购数量')
+			}
 		},
 		subNum() {
 			if(this.returnNum > 0) {
 				this.returnNum = this.returnNum - 1
+				this.$dispatch('refundProd', {id: this.prodInfo.sku.id, num: this.returnNum})
 			}	
 		}
 	},
-	events: {
-		selectAllProd: function(operate) {
-			if(operate === 'selected') {
-				this.selected = true
-			} else if(operate === 'cancel') {
-				this.selected = false
-			}
-		}
-	},
+	beforeCompile() {
+		this.sum = parseFloat( this.prodInfo.price ) * parseFloat( this.prodInfo.num )
+		this.pic = this.prodInfo.sku.pic ? this.prodInfo.sku.pic : '//static.eyaos.com/images/no_product.png'
+	}
 
 }
 
