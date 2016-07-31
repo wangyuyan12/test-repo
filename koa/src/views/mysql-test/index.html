@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>Mysql Test</title>
+    <style>
+    	.weixin {
+        border: 2px solid gray;
+        width: 50%;
+        
+      }
+    </style>
+  </head>
+  <body>
+	 <div class="weixin">
+    <input type="button" id="test1" value="Send Post"> <br>
+   </div>
+   <span id='csrf'>{{ csrf }}</span>
+  </body>
+  <!-- <script src='http://res.wx.qq.com/open/js/jweixin-1.0.0.js'></script> -->
+  <script>
+  /*var csrftoken = document.cookie.match(/csrftoken=\w+/ig)[0].replace(/csrftoken=/, '')*/
+
+  var csrftoken = document.cookie.match(/csrfnode=[\w-]+/ig)[0].replace(/csrfnode=/, '')
+  console.log('csrfnode', csrftoken)
+
+  var param = {
+    total: 1000,
+    deposit: 100,
+    orderState: 2, 
+    companyId: 2,
+    shopId: 3,
+    authNum: 2,
+  }
+
+  document.getElementById('test1').addEventListener('click', function() {
+    fetch('/mysql-test/insert', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-csrf-token': csrftoken,
+      },
+      body: JSON.stringify(param)
+    }).then((res) => {
+      res.json().then((resp) => {
+        console.log('ok')
+      })
+    })
+  })
+</script>
+ </html>

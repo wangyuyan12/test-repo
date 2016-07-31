@@ -5,7 +5,6 @@ const cluster = require('cluster')
 const path = require('path')
 const log4js = require('koa-log4')
 
-//为什么要重新定义一次？？
 const rootDir = path.resolve(__dirname, '..')
 const logDir = path.join(rootDir, 'logs')
 log4js.configure(path.join(rootDir, 'config/log4js.json'), { cwd: logDir })

@@ -26,6 +26,24 @@
             "type": "file",
             "filename": "errors.log"
           }
+        },
+        {
+        "type": "logLevelFilter",
+        "level": "FATAL",
+        "appender": {
+            "type": "smtp",
+            "recipients": "recipients@foxmail.com",
+            "sender": "sender@163.com",
+            "sendInterval": 60,
+            "SMTP": {
+                "host": "smtp.163.com",
+                "port": 25,
+                "auth": {
+                    "user": "sender@163.com",
+                    "pass": "password"
+                }
+            }
+          }
         }
       ]
     }
