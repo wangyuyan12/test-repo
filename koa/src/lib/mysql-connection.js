@@ -38,17 +38,21 @@ let poolCreate = (config, callback_) => {
 		if(err) {
 			callback_(err, null)
 		} else {
+			console.log('get connected')
 			callback_(null, conn)
 		}
 	})
 }
 
-let mysqlPool = () => {
+let mysqlPool = (options) => {
+	let config = options || mysqlConf
+	
 	return new Promise((resolve, reject) => {
-		poolCreate(mysqlConf, (err, conn) => {
+		poolCreate(config, (err, conn) => {
 			if(err) {
 				reject(err)
 			}
+			console.log('resolve')
 			resolve(conn)
 		})
 	})

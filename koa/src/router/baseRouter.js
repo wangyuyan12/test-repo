@@ -7,7 +7,7 @@ const logger = log4js.getLogger('router')
 const router = new Router();
 
 const tokenValidate = require('../app/wechat/token/token-validate')
-const mysqlTest = require('../app/mysql-test/mysql-test')
+const MysqlTest = require('../app/mysql-test/mysql-test')
 
 router.get('/', co.wrap(function* (ctx, next) {
 	logger.debug('in /')
@@ -45,9 +45,9 @@ router.get('/mysql-test/select/:id', co.wrap(function* (ctx, next) {
 	logger.info('in /mysql-test/select/:id')
 
 	let id = ctx.params.id
+	let mysqlTest = new MysqlTest()
 	let result = yield mysqlTest.queryById({id: id})
-	logger.debug('result', result)
-	logger.debug('result[0]', result[0].id)
+
 	ctx.body = JSON.stringify(result)
 
 }))
@@ -61,9 +61,10 @@ router.get('/mysql-test', co.wrap(function* (ctx, next) {
 router.post('/mysql-test/insert', co.wrap(function* (ctx, next) {
 	logger.info('in /mysql-test/insert/')
 	logger.debug('session', ctx.session)
+	let mysqlTest = new MysqlTest()
 	let result = yield mysqlTest.insertItem(ctx)
-	
-	ctx.body = JSON.stringify(result)
+	result.status = 200
+	ctx.body = result
 
 }))
 router.get('/redis-test', co.wrap(function* (ctx, next) {

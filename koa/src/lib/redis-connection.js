@@ -19,12 +19,14 @@ let clientCreate = (config, callback_) => {
 	redis.on('error', (err) => {
 		callback_(err, null)  //捕捉异常
 	})
-
 }
 
-let redisConn = () => {
+let redisConn = (options) => {
+	
+	let config = options || redisConfig
+
 	return new Promise((resolve, reject) => {
-		clientCreate(redisConfig, (err, conn) => {
+		clientCreate(config, (err, conn) => {
 			if(err) {
 				reject(err)
 			}

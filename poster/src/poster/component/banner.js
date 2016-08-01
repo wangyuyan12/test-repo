@@ -21,7 +21,6 @@ class Banner extends Component {
 	evtAddTemplate(e) {
 		let newNode = findDOMNode(this.refs.banner)
 		newNode = cloneElement(newNode)
-		// newNode.setAttribute('added', 'true')
 		document.getElementById('banner-pos').appendChild(newNode)
 	}
 	render() {
