@@ -174,7 +174,6 @@
 </template>
 
 <script>
-import fetch from 'isomorphic-fetch'
 
 export default {
 	name: 'orderBlock',

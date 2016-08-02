@@ -162,6 +162,7 @@
 </template>
 
 <script>
+import fetch from 'isomorphic-fetch'
 import orderBlock from './order-block.vue'
 
 export default {

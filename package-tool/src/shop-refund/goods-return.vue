@@ -58,6 +58,7 @@
 </template>
 
 <script>
+import fetch from 'isomorphic-fetch'
 import goodsBlock from './goods-block.vue'
 
 export default {
