@@ -232,7 +232,7 @@ export default {
 						vm.refundNo = resp.number
 						vm.refundStatus = vm.stateList[resp.refund_state]
 						if(resp.refund_state === 1 ||
-							resp.refund_state ===3 ||
+							resp.refund_state === 3 ||
 							resp.refund_state === 4 ||
 							resp.refund_state === 7) {
 							vm.footType = 1
