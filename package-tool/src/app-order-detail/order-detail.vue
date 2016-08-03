@@ -73,7 +73,7 @@ export default {
 
 	data() {
 		return {
-			csrftoken: '',
+			token: null,
 			orderId: 0,
 			prods: [],
 			orderNo: '--',
@@ -87,48 +87,71 @@ export default {
 			phone: '--'
 		}
 	},
+	methods: {
+		connectWebViewJavascriptBridge(callback) {
+			if(window.WebViewJavascriptBridge) {
+				callback(WebViewJavascriptBridge)
+			} else {
+				document.addEventListener(
+					'WebViewJavascriptBridgeReady',
+					function() {
+						callback(WebViewJavascriptBridge)
+					},
+					false
+				)
+			}
+		}
+	},
 
 	ready() {
-		this.csrftoken = document.cookie.match(/csrftoken=\w+/ig)[0].replace(/csrftoken=/, '')
 		this.orderId = location.href.split('/').pop()
 		let vm = this
-		fetch('/purchase/api/proxy/order/' + this.orderId, {
-			method: 'GET',
-			credentials: 'include',
-			headers: {
-				'X-CSRFTOKEN': this.csrftoken,
-			}
-		}).then((res) => {
-			res.json().then((resp) => {
-				console.log('data', resp)
-				vm.orderNo = resp.number
-				if(resp.order_state === 2) {
-					vm.orderStatus = '待审核'
-				} else if(resp.order_state === 3) {
-					vm.orderStatus = '下单成功'
-				} else if(resp.order_state === 4) {
-					vm.orderStatus = '等待收货'
-				} else if(resp.order_state === 5) {
-					vm.orderStatus = '交易完成'
-				} else if(resp.order_state === 6) {
-					vm.orderStatus = '有退货'
-				} else if(resp.order_state === 10) {
-					vm.orderStatus = '订单关闭'
-				} else {
-					vm.orderStatus = '状态异常'
-				}
-				vm.sum = resp.total
-				vm.createTime = resp.create_time.replace('T', '\ ')
-				vm.prods = resp.order_skus
-				vm.shopName = resp.shop.name
-				vm.city = resp.shop.area.name
-				vm.address = resp.shop.address
-				vm.contact = resp.shop.contact
-				vm.phone = resp.shop.phone
+
+		this.connectWebViewJavascriptBridge((bridge) => {
+			bridge.init((message, responseCallback) => {
+				//获取token
+				vm.token = 'token\ \ ' + message
+				//请求接口
+				fetch('/purchase/api/proxy/order/' + vm.orderId, {
+					method: 'GET',
+					credentials: 'include',
+					headers: {
+						'Authorization': vm.token,
+					}
+				}).then((res) => {
+					res.json().then((resp) => {
+						console.log('data', resp)
+						vm.orderNo = resp.number
+						if(resp.order_state === 2) {
+							vm.orderStatus = '待审核'
+						} else if(resp.order_state === 3) {
+							vm.orderStatus = '下单成功'
+						} else if(resp.order_state === 4) {
+							vm.orderStatus = '等待收货'
+						} else if(resp.order_state === 5) {
+							vm.orderStatus = '交易完成'
+						} else if(resp.order_state === 6) {
+							vm.orderStatus = '有退货'
+						} else if(resp.order_state === 10) {
+							vm.orderStatus = '订单关闭'
+						} else {
+							vm.orderStatus = '状态异常'
+						}
+						vm.sum = resp.total
+						vm.createTime = resp.create_time.replace('T', '\ ')
+						vm.prods = resp.order_skus
+						vm.shopName = resp.shop.name
+						vm.city = resp.shop.area.name
+						vm.address = resp.shop.address
+						vm.contact = resp.shop.contact
+						vm.phone = resp.shop.phone
+					})
+				}).catch((err) => {
+					alert(err)
+				})
 			})
-		}).catch((err) => {
-			alert(err)
 		})
+		
 	},
 }
 </script>

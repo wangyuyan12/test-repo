@@ -109,6 +109,7 @@ export default {
 	data() {
 		return {
 			csrftoken: '',
+			token: null,
 			orderId: 0,
 			prods: [],
 			refundNo: '--',
@@ -144,56 +145,119 @@ export default {
 	},
 
 	methods: {
+
+		modifyRefundStatus(param, vm) {
+			fetch('/purchase/api/proxy/refundorder/' + vm.orderId, {
+				method: 'PATCH',
+				credentials: 'include',
+				headers: {
+					'Authorization': vm.token,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(param)
+			}).then((res) => {
+				res.json().then((resp) => {
+					vm.refundStatus = vm.stateList[resp.refund_state]
+					vm.footType = 0
+				}).catch(err => {
+					alert('修改失败请重试！')
+				})
+				
+			}).catch((err) => {
+				console.log('err', err)
+				alert('修改失败请重试！')
+			})
+		},
+
 		rejectAppeal() {
-			return
+			let con = confirm('拒绝退货？')
+			if(con) {
+				this.modifyRefundStatus({'refund_state': 12}, this)
+			} else {
+				return
+			}
+			
 		},
 		acceptAppeal() {
-			return
+			let con = confirm('同意退货？')
+			if(con) {
+				this.modifyRefundStatus({}, this)
+			} else {
+				return
+			}
+			
 		},
 		signedRefund() {
-			return
+			let con = confirm('确认收货')
+			if(con) {
+				this.modifyRefundStatus({'refund_state': 10}, this)
+			} else {
+				return
+			}
+		},
+		connectWebViewJavascriptBridge(callback) {
+			if(window.WebViewJavascriptBridge) {
+				callback(WebViewJavascriptBridge)
+			} else {
+				document.addEventListener(
+					'WebViewJavascriptBridgeReady',
+					function() {
+						callback(WebViewJavascriptBridge)
+					},
+					false
+				)
+			}
 		}
 	},
 
 	ready() {
-		this.csrftoken = document.cookie.match(/csrftoken=\w+/ig)[0].replace(/csrftoken=/, '')
+
 		this.orderId = location.href.split('/').pop()
 		let vm = this
-		fetch('/purchase/api/proxy/refundorder/' + this.orderId, {
-			method: 'GET',
-			credentials: 'include',
-			headers: {
-				'X-CSRFTOKEN': this.csrftoken,
-			}
-		}).then((res) => {
-			res.json().then((resp) => {
-				console.log('data', resp)
-				vm.refundNo = resp.number
-				vm.refundStatus = vm.stateList[resp.refund_state]
-				if(resp.refund_state === 1 ||
-					resp.refund_state ===3 ||
-					resp.refund_state === 4 ||
-					resp.refund_state === 7) {
-					vm.footType = 1
-				} else if(resp.refund_state === 9) {
-					vm.footType = 2
-				}
-				vm.sum = parseFloat(resp.price)*resp.num
-				vm.createTime = resp.create_time.replace('T', '\ ')
-				let prodInfo = {}
-				prodInfo.sku = resp.sku
-				prodInfo.num = resp.num
-				prodInfo.price = parseFloat(resp.price)
-				vm.prods.push(prodInfo)
-				vm.shopName = resp.shop.name
-				vm.city = resp.shop.area.name
-				vm.address = resp.shop.address
-				vm.contact = resp.shop.contact
-				vm.phone = resp.shop.phone
+
+		this.connectWebViewJavascriptBridge((bridge) => {
+			bridge.init((message, responseCallback) => {
+				//获取token
+				vm.token = 'token\ \ ' + message
+				//请求数据
+				fetch('/purchase/api/proxy/refundorder/' + vm.orderId, {
+					method: 'GET',
+					credentials: 'include',
+					headers: {
+						'Authorization': vm.token,
+					}
+				}).then((res) => {
+					res.json().then((resp) => {
+						console.log('data', resp)
+						vm.refundNo = resp.number
+						vm.refundStatus = vm.stateList[resp.refund_state]
+						if(resp.refund_state === 1 ||
+							resp.refund_state ===3 ||
+							resp.refund_state === 4 ||
+							resp.refund_state === 7) {
+							vm.footType = 1
+						} else if(resp.refund_state === 9) {
+							vm.footType = 2
+						}
+						vm.sum = parseFloat(resp.price)*resp.num
+						vm.createTime = resp.create_time.replace('T', '\ ')
+						let prodInfo = {}
+						prodInfo.sku = resp.sku
+						prodInfo.num = resp.num
+						prodInfo.price = parseFloat(resp.price)
+						vm.prods.push(prodInfo)
+						vm.shopName = resp.shop.name
+						vm.city = resp.shop.area.name
+						vm.address = resp.shop.address
+						vm.contact = resp.shop.contact
+						vm.phone = resp.shop.phone
+					})
+				}).catch((err) => {
+					alert(err)
+				})
 			})
-		}).catch((err) => {
-			alert(err)
-		})
+		})	
 	},
+
 }
 </script>
