@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload</title>
+  <style>
+    body {
+      padding: 50px;
+      font: 14px Helvetica, Arial;
+    }
+  </style>
+</head>
+<body>
+  <h1>File Upload</h1>
+  <p>Try uploading multiple files at a time.</p>
+  <!-- <iframe style="display:none" name="csrf-frame"></iframe>
+  <form action="/upload/img" method="post" enctype="multipart/form-data"
+  csrf={{ csrfnode }}
+   target="csrf-frame" id="csrf-form">
+    <input type="hidden" name="csrf" value={{ csrfnode }}>
+    <input type="file" name="file" multiple>
+    <input type="submit" value="Upload">
+  </form>
+  <script>document.getElementById("csrf-form").submit()</script> -->
+  <form id="uploadimage" action="" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" required>
+    <input type="submit" value="Upload">
+  </form>
+  <p>use file upload</p>
+  <input type="file" name="files" id='fileupload-input1' class="fileupload-input" value="fileUpload1">
+  <input type="file" name="files" id='fileupload-input2' class="fileupload-input" value="fileUpload2">
+  <p>upload img</p>
+  <div id="show-img">
+    <input type="button" value="upload" id="to-upload">
+    <img src="" alt="">
+  </div>
+  <script src="/static/common/jquery.2.1.4.min.js"></script>
+  <script src='/static/common/jquery-ui.min.js'></script>
+  <script src='/static/common/jquery.fileupload.js'></script>
+  <script>
+  $(function() {
+    var csrftoken = document.cookie.match(/csrfnode=[\w-]+/ig)[0].replace(/csrfnode=/, '')
+    console.log('csrfnode', csrftoken)
+    $('#uploadimage').on('submit', function(e) {
+      e.preventDefault()
+      $.ajax ({
+        url: '/upload/img',
+        type: 'POST',
+        beforeSend: function(xhr) {
+          xhr.setRequestHeader("x-csrf-token", csrftoken)
+        },
+        data: new FormData(this),
+        contentType: false, // 告诉jQuery不要去设置Content-Type请求头
+        processData: false, // 告诉jQuery不要去处理发送的数据
+      }).done(function(data) {
+        console.log('response', data)
+      }).fail(function(err) {
+        console.log('error', err)
+      })
+    })
+
+    /*$('#fileupload-input').fileupload({
+      url: '/upload/img',
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader("x-csrf-token", csrftoken)
+      },
+      done: function(e, result) {
+        console.log('upload finished!')
+        console.log(result.result)
+        result = JSON.parse(result.result)
+        var str = '<img src="' + result[0].path + '" alt="ok">'
+        $('#show-img').html(str)
+      }
+    })*/
+
+    /*$('#fileupload-input').fileupload({
+      url: '/upload/img',
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader("x-csrf-token", csrftoken)
+      },
+      add: function(e, result) {
+        console.log('result', result)
+        $('#to-upload').click(function() {
+          result.submit()
+        })
+      },
+      done: function(e, result) {
+        console.log('upload finished!')
+        console.log(result.result)
+      }
+    })*/
+
+    /*$('.fileupload-input').each(function() {
+      $(this).fileupload({
+        url: '/upload/img',
+        beforeSend: function(xhr) {
+          xhr.setRequestHeader("x-csrf-token", csrftoken)
+        },
+        done: function(e, result) {
+          console.log('upload finished!')
+          console.log(result.result)
+          result = JSON.parse(result.result)
+          var str = '<img src="' + result[0].path + '" alt="ok">'
+          $('#show-img').append(str)
+        }
+      })
+    })*/
+    $('.fileupload-input').each(function() {  //一次上传多张图片
+      $(this).fileupload({
+        url: '/upload/img',
+        beforeSend: function(xhr) {
+          xhr.setRequestHeader("x-csrf-token", csrftoken)
+        },
+        add: function(e, result) {
+          $('#to-upload').click(function() {
+            result.submit()
+          })
+        },
+        done: function(e, result) {
+          console.log('upload finished!')
+          console.log(result.result)
+          result = JSON.parse(result.result)
+          var str = '<img src="' + result[0].path + '" alt="ok">'
+          $('#show-img').append(str)
+        }
+      })
+    })
+
+  })
+    
+    
+  </script>
+</body>
+</html>

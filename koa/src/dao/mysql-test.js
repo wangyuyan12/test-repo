@@ -11,7 +11,7 @@ class MysqlTestDao {
 			mysqlPool().then((conn) => {
 				let sql = 'select * from kuaijie.purchase_order where id = ' + param.id
 				conn.query(sql, (err, result) => {
-					conn.release()
+					conn.release()  //一定记得释放
 					if(err) {
 						reject(err)
 					}
@@ -35,7 +35,7 @@ class MysqlTestDao {
 				 + param.companyId + ', ' + param.shopId + ', ' + param.authNum + ');'
 				 logger.debug('sql', sql)
 				 conn.query(sql, (err, result) => {
-				 	conn.release()
+				 	conn.release() //一定记得释放
 				 	if(err) {
 				 		reject(err)
 				 	}
