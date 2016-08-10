@@ -259,13 +259,8 @@
 			transition='leaveshow'
 			v-if='isPageOne'>
 			<div class='sku-banner'>
-				<slider :count='imgNum' :interval='3000'>
-					<div class="slider" v-for='item in imgs'>
-						<a :href="">
-							<img class="slider-img" :src="item.ad_pic">
-						</a>
-					</div>
-				</slider>
+				<!-- 等数据更新好之后，渲染slider，否则 呵呵 -->
+				<slider v-if='imgs.length > 0' :interval='3000' :img-array='imgs' > </slider>
 			</div>
 			<div class='sku-head'>
 				<div class="sku-name"><span>{{ skuName }}</span></div>
@@ -357,7 +352,7 @@
 			</span>
 		</div>
 		<div class="add-cart">
-			<button @click="addCart">{{ cartStatus ? "确定" : '加入购物车' }}</button>
+			<button @click="addCart" :disabled="btnStatus" :style="{backgroundColor: btnStatus ? 'gray' : '#30b3fb'}">{{ cartStatus ? "确定" : '加入购物车' }}</button>
 		</div>
 		<div class="cover" :style="{display: cartStatus ? 'block' : 'none'}"></div>
 	</div>
@@ -402,12 +397,10 @@ export default {
 			isPageOne: true,
 			startY: 0,
 			offsetY: 0,
-			imgs: [{ad_pic: 'http://image.iqing.in/recommend/613890e9-3e5d-4acd-afae-003201e1d86d.jpg-cover'},
-					{ad_pic: 'http://image.iqing.in/recommend/11576c83-d543-46e9-9725-89125bd066c2.jpg-cover'},
-					{ad_pic: 'http://image.iqing.in/recommend/21bd4d0d-19cb-44a5-8946-8ddfc7326ee2.jpg-cover'}],
+			imgs: [],  //先置为空
 			addCartNum: 0,
 			cartStatus: false, //false: 加入购物车; true: 确定
-
+			btnStatus: true,
 		}
 	},
 
@@ -476,6 +469,7 @@ export default {
 						res.json().then((resp) => {
 							if(resp.status === 200) {
 								console.log('cart add success')
+								self.location = '/purchase/m/shoppingcar/'
 							} else {
 								alert('抱歉， 提交失败！')
 							}
@@ -507,7 +501,7 @@ export default {
 
 	ready() {
 		this.skuId = /detail\/\d+/.exec(location.href)[0].replace('detail\/', '')
-		this.csrftoken = document.cookie.match(/csrftoken=\w+/ig)[0].replace(/csrftoken=/, '')
+		this.csrftoken = document.cookie.match(/csrftoken=\w+/g)[0].replace(/csrftoken=/, '')
 		let vm = this
 		fetch('/purchase/api/m/skuonline/detail/' + this.skuId, {
 			method: 'GET',
@@ -526,17 +520,22 @@ export default {
 					vm.unit = resp.unit || '--'
 					vm.rate = parseFloat(resp.rate) * 100 || 0
 					vm.limit = resp.limit === 1 ? '中包' : (resp.limit === 2 ? '整件' : '拆零')
-					vm.imgs = resp.sku.pics
-					vm.stock = resp.sku_stock.stock
-					vm.adMsg =  resp.sku.ad_msg
-					vm.midBag = resp.middle
-					vm.largeBag = resp.package
-					vm.isMedCare = resp.sku_pro.yibao ? '是' : '否'
-					vm.license = resp.license
-					vm.factory = resp.sku.factory
-					vm.company = resp.online_area.company.name
-					vm.limitNum = resp.limit_num
-					vm.addCartNum = resp.limit_num
+					vm.imgs = resp.sku.pics.length > 0 ? resp.sku.pics : [{ad_pic: '//static.eyaos.com/images/no_product.png'}]
+					vm.stock = resp.sku_stock ? resp.sku_stock.stock : 0
+					if(vm.stock === 0 || resp.sku_stock.sku_status === false) {
+						vm.btnStatus = true
+					} else {
+						vm.btnStatus = false
+					}
+					vm.adMsg =  resp.sku.ad_msg || '--'
+					vm.midBag = resp.middle || '--'
+					vm.largeBag = resp.package || '--'
+					vm.isMedCare = resp.sku_pro ? (resp.sku_pro.yibao ? '是' : '否') : '否'
+					vm.license = resp.license || '--'
+					vm.factory = resp.sku.factory || '--'
+					vm.company = resp.online_area ? (resp.online_area.company.name || '--') : '--'
+					vm.limitNum = resp.limit_num || '--'
+					vm.addCartNum = resp.limit_num || '--'
 				})
 			}
 		}).catch((err) => {
@@ -545,6 +544,7 @@ export default {
 	},
 	computed: {
 		imgNum: function() {
+			console.log('imgs', this.imgs.length)
 			return this.imgs.length
 		},
 

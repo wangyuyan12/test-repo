@@ -198,7 +198,7 @@ export default {
 		}
 	},
 	ready() {
-		this.csrftoken = document.cookie.match(/csrftoken=\w+/ig)[0].replace(/csrftoken=/, '')
+		this.csrftoken = document.cookie.match(/csrftoken=\w+/g)[0].replace(/csrftoken=/, '')
 		this.orderId = /detail\/\d+/.exec(location.href)[0].replace('detail\/', '')
 		let vm = this
 		//加载订单详情

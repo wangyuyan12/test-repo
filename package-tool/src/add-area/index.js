@@ -3,7 +3,7 @@ import './tz_base.css'
 import $ from 'jquery'
 
 $(() => {
-	let csrftoken = document.cookie.match(/csrftoken=\w+/ig)[0].replace(/csrftoken=/, '')
+	let csrftoken = document.cookie.match(/csrftoken=\w+/g)[0].replace(/csrftoken=/, '')
 	let skuId = /add\/\d+/.exec(location.href)[0].replace('add\/', '')
 	let rendSku = (sku) => {
 		return '<img src=' + sku.pic + '>'
