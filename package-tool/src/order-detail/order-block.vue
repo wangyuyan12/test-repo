@@ -203,6 +203,7 @@ export default {
 	beforeCompile() {
 		this.sum = parseFloat( this.orderInfo.price ) * parseFloat( this.orderInfo.num )
 		this.pic = this.orderInfo.sku.pic ? this.orderInfo.sku.pic : '//static.eyaos.com/images/no_product.png'
+		console.log('sku_auth', this.orderInfo.sku_auth)
 		this.verifyTag = this.orderInfo.sku_auth ? ( this.orderInfo.sku_auth.auth_state === 1 ? 'block' : 'none' ) : 'block'
 		this.prodStatus = this.orderInfo.state === 1 ? '' : (this.orderInfo.state === 2 ? '已取消' : '取消中')
 		this.showBatchDate = this.orderStatus > 3 ? true : false  

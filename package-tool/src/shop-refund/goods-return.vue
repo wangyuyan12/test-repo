@@ -1,4 +1,6 @@
 <style lang="less">
+@import '../common/loading/loading.css';
+
 	.page-wrapper {
 		position: relative;
 		background-color: #fff;
@@ -54,6 +56,13 @@
 			</span> -->
 			<span class="goods-operate" :style="{backgroundColor: enabelRefund ? '#30b3fb' : '#d9d9d9'}" @click="refundApply" >确认退货</span>
 		</div>
+		<div v-if="loading" class="load-wrapp">
+	        <div class="load load-1">
+	            <div class="line"></div>
+	            <div class="line"></div>
+	            <div class="line"></div>
+	        </div>
+	    </div>
 	</div>
 </template>
 
@@ -72,11 +81,13 @@ export default {
 			orderId: 0,
 			prods: [],
 			refundProds: [],  //选退货产品
+			loading: true,
 		}
 	},
 	methods: {
 		refundApply() {
-
+			let vm = this
+			vm.loading = true
 			if(this.enabelRefund) {
 				fetch('/purchase/api/shop/refundorder/apply/' + this.orderId, {
 					method: 'POST',
@@ -89,14 +100,17 @@ export default {
 				}).then((res) => {
 					res.json().then((resp) => {
 						console.log('resp', resp)
+						vm.loading = false
 						if(resp.status === 201) {
-							alert('退货成功')
-							window.history.back()
+							// Jalert('退货成功', 'icon-ok')
+							location.href = '/purchase/m/order/list/'
 						}
+						
 					})
 				}).catch((err) => {
 					console.log(err)
-					alert('退货失败，请重试')
+					vm.loading = false
+					Jalert('请重试', 'icon-error')
 				})
 			}
 		}
@@ -127,10 +141,14 @@ export default {
 				'X-CSRFTOKEN': vm.csrftoken,
 			}
 		}).then((res) => {
+			Loading('hide')
 			res.json().then((resp) => {
 				console.log('resp', resp)
-				vm.prods = resp
+				vm.prods = resp	
 			})
+		}).catch((err) => {
+			Loading('hide')
+			Jalert('请重试！', 'icon-error')
 		})
 
 	},

@@ -1,4 +1,5 @@
 <style lang="less">
+@import '../common/loading/loading.css';
 	.page-wrapper {
 		position: relative;
 		background-color: #fff;
@@ -54,7 +55,6 @@
 			</span>
 			<span class="order-operate" :style="{backgroundColor: enabelCancel ? '#30b3fb' : '#d9d9d9'}" @click="cancelSkus">取消所选药品</span>
 		</div>
-
 	</div>
 	
 </template>
@@ -102,6 +102,8 @@ export default {
 					all: this.selectAll,
 					sku_list: this.selectedItem,
 				}
+				let vm = this
+				Loading('show')
 				//取消订单接口
 				fetch('/purchase/api/shop/order/update/' + this.orderId, {
 					method: 'PATCH',
@@ -113,16 +115,19 @@ export default {
 					body: JSON.stringify(param)
 				}).then((res) => {
 					res.json().then((resp) => {
+						Loading('hide')
 						console.log('resp', resp)
 						if(resp.status === 200) {
 							self.location = '/purchase/m/order/list/'
 						} else {
-							alert(resp.detail)
+							console.log('resp', resp.detail)
+							Jalert('请重试！', 'icon-error')
 						}
 					})
 				}).catch((err) => {
+					Loading('hide')
 					console.log('err', err)
-					alert('取消失败，请重试！')
+					alert('请重试！', 'icon-error')
 				})
 			}
 		}
@@ -156,6 +161,7 @@ export default {
 		this.csrftoken = document.cookie.match(/csrftoken=\w+/g)[0].replace(/csrftoken=/, '')
 		this.orderId = /cancel\/\d+/.exec(location.href)[0].replace('cancel\/', '')
 		let vm = this
+		Loading('show')
 		//加载订单详情
 		fetch('/purchase/api/order/' + this.orderId, {
 			method: 'GET',
@@ -172,6 +178,7 @@ export default {
 						vm.selectAbleLength += 1
 					}
 				}
+				Loading('hide')
 			})
 		})
 	}

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>LOADING</title>
+    <style>
+    body{
+      font-family: "Microsoft Yahei",tahoma,arial,"Hiragino Sans GB","helvetica neue",helvetica,arial,Sans-serif,"Hiragino Sans GB","Hiragino Sans GB W3","SimHei";
+      margin: 0px;
+      background-color: #f5f5f5;
+      position: relative;
+    }
+    button {
+      z-index: 100;
+      height: 30px;
+      width: 65px;
+      margin-left: 5px;
+      margin-top: 10px;
+    }
+    </style>
+  </head>
+  <body>
+    <div id='sku-detail'>
+    <button id="btn"> type null </button>
+      <button id="btn1"> type 1 </button>
+      <button id="btn2"> type 2 </button>
+      <button id="btn3"> type 3 </button>
+      <button id="btn4"> type 4 </button>
+      <button id="btn5"> type 5 </button>
+      <button id="btn6"> type 6 </button>
+      <button id="btn7"> type 7 </button>
+      <button id="btn8"> type 8 </button>
+      <button id="btn9"> type 9 </button>
+      <button id="btn10"> type 10 </button>
+    </div>  
+    <script src="./loading-1.0.js"></script>  
+    <script>
+      document.getElementById('btn').addEventListener('click', function() {
+          Loading('show')
+          setTimeout(function(){ Loading('hide'); location.reload() }, 5000)
+      })
+      document.getElementById('btn1').addEventListener('click', function() {
+          Loading('show', 1)
+          setTimeout(function(){ Loading('hide'); location.reload() }, 5000)
+      })
+      document.getElementById('btn2').addEventListener('click', function() {
+          Loading('show', 2)
+          setTimeout(function(){ Loading('hide'); location.reload()  }, 5000)
+      })
+      document.getElementById('btn3').addEventListener('click', function() {
+          Loading('show', 3)
+          setTimeout(function(){ Loading('hide'); location.reload()  }, 5000)
+      })
+      document.getElementById('btn4').addEventListener('click', function() {
+          Loading('show', 4)
+          setTimeout(function(){ Loading('hide'); location.reload()  }, 5000)
+      })
+      document.getElementById('btn5').addEventListener('click', function() {
+          Loading('show', 5)
+          setTimeout(function(){ Loading('hide'); location.reload()  }, 5000)
+      })
+      document.getElementById('btn6').addEventListener('click', function() {
+          Loading('show', 6)
+          setTimeout(function(){ Loading('hide'); location.reload()  }, 5000)
+      })
+      document.getElementById('btn7').addEventListener('click', function() {
+          Loading('show', 7, 'yellow')
+          setTimeout(function(){ Loading('hide'); location.reload()  }, 5000)
+      })
+      document.getElementById('btn8').addEventListener('click', function() {
+          Loading('show', 8, 'red')
+          setTimeout(function(){ Loading('hide'); location.reload()  }, 5000)
+      })
+      document.getElementById('btn9').addEventListener('click', function() {
+          Loading('show', 9, 'green')
+          setTimeout(function(){ Loading('hide'); location.reload()  }, 5000)
+      })
+      document.getElementById('btn10').addEventListener('click', function() {
+          Loading('show', 10, 'blue')
+          setTimeout(function(){ Loading('hide'); location.reload()  }, 5000)
+      })
+    </script>
+  </body>
+</html>

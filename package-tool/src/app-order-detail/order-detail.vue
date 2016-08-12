@@ -84,7 +84,7 @@ export default {
 			city: '--',
 			address: '--',
 			contact: '--',
-			phone: '--'
+			phone: '--',
 		}
 	},
 	methods: {
@@ -106,7 +106,7 @@ export default {
 	ready() {
 		this.orderId = location.href.split('/').pop()
 		let vm = this
-
+		Loading('show')
 		this.connectWebViewJavascriptBridge((bridge) => {
 			bridge.init((message, responseCallback) => {
 				//获取token
@@ -145,9 +145,11 @@ export default {
 						vm.address = resp.shop.address
 						vm.contact = resp.shop.contact
 						vm.phone = resp.shop.phone
+						Loading('hide')
 					})
 				}).catch((err) => {
-					alert(err)
+					Loading('hide')
+					Jalert('请重试！', 'icon-error')
 				})
 			})
 		})

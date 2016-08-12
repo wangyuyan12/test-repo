@@ -281,6 +281,7 @@ export default {
 		},
 		refundOperate(param) {
 			let vm = this
+			Loading('show')
 			fetch('/purchase/api/shop/refundorder/' + this.refundId, {
 				method: 'PATCH',
 				credentials: 'include',
@@ -292,12 +293,14 @@ export default {
 			}).then((res) => {
 				res.json().then((resp)=> {
 					console.log('resp', resp)
+					Loading('hide')
 					vm.statusSetting(resp.refund_state)
 					vm.cancelSubmit() //关闭弹窗
 				})
 			}).catch((err) => {
 				console.log(err)
-				alert('修改失败，请重试！')
+				Loading('hide')
+				Jalert('请重试！', 'icon-error')
 			})
 		},
 		onExpressInput() {
@@ -372,6 +375,7 @@ export default {
 		this.csrftoken = document.cookie.match(/csrftoken=\w+/g)[0].replace(/csrftoken=/, '')
 		this.refundId = /detail\/\d+/.exec(location.href)[0].replace('detail\/', '')
 		let vm = this
+		Loading('show')
 		//加载订单详情
 		fetch('/purchase/api/shop/refundorder/' + this.refundId, {
 			method: 'GET',
@@ -396,10 +400,10 @@ export default {
 				vm.remain = resp.remain
 				vm.orderNum = resp.number
 				vm.createTime = resp.create_time.replace('T', '\ ')
+				Loading('hide')
 			})
 		})
 	},
-
 
 }
 </script>

@@ -1,5 +1,4 @@
 <style lang='less'>
-
 	.fn-clear::after {
 	    display: block;
 	    font-size: 0;
@@ -271,7 +270,11 @@
 					<span class="rate">支付订金{{ rate }}%</span>
 				</div>
 			</div>
-			<div class="sku-info">
+			<div class="sku-info"
+				@touchstart ='touchStartP1'
+				@touchmove="touchMoveP1" 
+				@touchend="touchEndP1"
+				@touchcancel="touchCancelP1">
 				<p>
 					<span class="info-left">规格:&nbsp;&nbsp;{{ specs }}</span>
 					<span class="info-right">库存数量:&nbsp;&nbsp;{{ stock }}</span>
@@ -288,7 +291,8 @@
 				:style="{height: showMoreHeight + 'px'}"
 				@touchstart ='touchStartP1'
 				@touchmove="touchMoveP1" 
-				@touchend="touchEndP1">
+				@touchend="touchEndP1"
+				@touchcancel="touchCancelP1">
 				<img src="/static/classic/purchase/resource/arrow.jpg">
 				<span>下拉显示更多</span>
 			</div>
@@ -304,7 +308,8 @@
 				:style="{height: conthHeight + 'px'}" 
 				@touchstart ='touchStartP2'
 				@touchmove="touchMoveP2" 
-				@touchend="touchEndP2">		
+				@touchend="touchEndP2"
+				@touchcancel="touchCancelP2">		
 				<div class="content" v-if='isProdCont'>
 					<div class="content-head">
 						<span>产品详情</span>
@@ -355,7 +360,7 @@
 			<button @click="addCart" :disabled="btnStatus" :style="{backgroundColor: btnStatus ? 'gray' : '#30b3fb'}">{{ cartStatus ? "确定" : '加入购物车' }}</button>
 		</div>
 		<div class="cover" :style="{display: cartStatus ? 'block' : 'none'}"></div>
-	</div>
+    </div>
 	
 </template>
 
@@ -420,11 +425,17 @@ export default {
 			if(this.offsetY < 0) {
 				document.getElementById('page-one').style.top = this.offsetY + 'px'
 			}
-			if(this.offsetY < -150) {
+			if(this.offsetY < -100) {
 				this.isPageOne = false
 			}
 		},
 		touchEndP1(e) {
+			e.preventDefault()
+			document.getElementById('page-one').style.top = 0 + 'px'
+			this.$els.wordpic.innerHTML = this.adMsg  //渲染图文详情
+			return
+		},
+		touchCancelP1(e) {
 			e.preventDefault()
 			document.getElementById('page-one').style.top = 0 + 'px'
 			this.$els.wordpic.innerHTML = this.adMsg  //渲染图文详情
@@ -442,11 +453,16 @@ export default {
 			if(this.offsetY > 0) {
 				document.getElementById('page-two').style.top = this.offsetY + 'px'
 			}
-			if(this.offsetY > 150) {
+			if(this.offsetY > 100) {
 				this.isPageOne = true
 			}
 		},
 		touchEndP2(e) {
+			e.preventDefault()
+			document.getElementById('page-two').style.top = 0 + 'px'
+			return
+		},
+		touchCancelP2(e) {
 			e.preventDefault()
 			document.getElementById('page-two').style.top = 0 + 'px'
 			return
@@ -456,6 +472,8 @@ export default {
 			if(this.cartStatus) {
 				let param = [{id: this.skuId, num: this.addCartNum }]
 				param = JSON.stringify(param)
+				let vm = this
+				Loading('show')
 				fetch('/purchase/api/m/cart/', {
 					method: 'POST',
 					credentials: 'include',
@@ -467,16 +485,18 @@ export default {
 				}).then((res) => {
 					if(res.ok) {
 						res.json().then((resp) => {
+							Loading('hide')
 							if(resp.status === 200) {
 								console.log('cart add success')
 								self.location = '/purchase/m/shoppingcar/'
 							} else {
-								alert('抱歉， 提交失败！')
+								Jalert('请重试！', 'icon-error')
 							}
 						})
 					}
 				}).catch((err) => {
-					alert('抱歉， 提交失败！')
+					Loading('hide')
+					Jalert('请重试！', 'icon-error')
 				})
 				this.cartStatus = false
 
@@ -496,13 +516,17 @@ export default {
 				this.addCartNum = this.addCartNum - this.limitNum
 			}
 		}
-
 	},
 
 	ready() {
+		this.showMoreHeight = window.innerHeight - 560
+		if(this.showMoreHeight < 80) {
+			this.showMoreHeight = 80
+		}
 		this.skuId = /detail\/\d+/.exec(location.href)[0].replace('detail\/', '')
 		this.csrftoken = document.cookie.match(/csrftoken=\w+/g)[0].replace(/csrftoken=/, '')
 		let vm = this
+		Loading('show')
 		fetch('/purchase/api/m/skuonline/detail/' + this.skuId, {
 			method: 'GET',
 			credentials: 'include',
@@ -512,6 +536,8 @@ export default {
 		}).then(function(res){
 			if(res.ok) {
 				res.json().then(function(resp) {
+					console.log('resp', resp)
+					Loading('hide')
 					vm.skuName = resp.sku.name || '--'
 					vm.priceInt = resp.online_area.price.split('.')[0] || '--'
 					vm.priceDeci = resp.online_area.price.split('.')[1] || '--'
@@ -520,7 +546,15 @@ export default {
 					vm.unit = resp.unit || '--'
 					vm.rate = parseFloat(resp.rate) * 100 || 0
 					vm.limit = resp.limit === 1 ? '中包' : (resp.limit === 2 ? '整件' : '拆零')
-					vm.imgs = resp.sku.pics.length > 0 ? resp.sku.pics : [{ad_pic: '//static.eyaos.com/images/no_product.png'}]
+					if(resp.sku.pics.length > 0) {
+
+						for(let i=0; i<resp.sku.pics.length; i++) {
+							resp.sku.pics[i].ad_pic = '//static.eyaos.com/images/no_product.png'
+						}
+						vm.imgs = resp.sku.pics
+					} else {
+						vm.imgs = [{ad_pic: '//static.eyaos.com/images/no_product.png'}]
+					}
 					vm.stock = resp.sku_stock ? resp.sku_stock.stock : 0
 					if(vm.stock === 0 || resp.sku_stock.sku_status === false) {
 						vm.btnStatus = true
@@ -539,6 +573,7 @@ export default {
 				})
 			}
 		}).catch((err) => {
+			Loading('hide')
 			console.log('err', err)
 		})
 	},

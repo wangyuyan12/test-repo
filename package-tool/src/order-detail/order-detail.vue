@@ -127,7 +127,7 @@
 			<span class="sum">订单总额：&nbsp;￥{{ total }}</span><br>
 			<!-- <span class="deposit">定金金额：&nbsp;￥360</span><br> -->
 			<span class="order-num">订单编号：&nbsp;{{ orderNum }}</span><br>
-			<span class="order-create">订单创建时间：&nbsp;{{createTime[0]}}&nbsp;&nbsp;{{createTime[1]}}</span>
+			<span class="order-create">订单创建时间：&nbsp;{{ createTime }}</span>
 		</div>
 		<div class="footbar" :style="{display: footerDisp}">
 			<div v-if="footerMode === 0">
@@ -139,12 +139,12 @@
 				 <!-- //第一期 付款 改为 提交 -->
 			</div>
 			<div v-if="footerMode === 2">
-				<a href=""><span v-else class="other-status left">确认收货</span></a>
+				<span @click="receivedGoogs" class="other-status left" >确认收货</span>
 				<span  class="other-status right" @click="callCompany">联系商业公司</span>
 			</div>
 			<div v-if="footerMode === 3">
-				<a href=""><span v-else class="other-status left">申请退货</span></a>
-				<span  class="other-status right" @click="callCompany">联系商业公司</span>
+				<a href='/purchase/m/order/refund/{{orderId}}'><span class="other-status left">申请退货</span></a>
+				<span class="other-status right" @click="callCompany">联系商业公司</span>
 			</div>	
 		</div>
 	</div>
@@ -158,7 +158,6 @@
 			</div>
 		</div>
 	</div>
-	
 </template>
 
 <script>
@@ -186,7 +185,7 @@ export default {
 			footerDisp: 'block',
 			footerMode: 0,
 			showCall: 'none',
-			phone: '13212342345'
+			phone: '13212342345',
 		}
 	},
 	methods: {
@@ -195,12 +194,42 @@ export default {
 		},
 		cancelCall() {  //取消拨打
 			this.showCall = 'none'
-		}
+		},
+		receivedGoogs() {
+			//取消订单接口
+			let vm = this
+			Loading('show')
+			fetch('/purchase/api/shop/order/update/' + this.orderId, {
+				method: 'PATCH',
+				credentials: 'include',
+				headers: { 
+					'Content-Type': 'application/json',
+					'X-CSRFTOKEN': this.csrftoken,
+				},
+				body: JSON.stringify({order_state: 5})
+			}).then((res) => {
+				res.json().then((resp) => {
+					Loading('hide')
+					console.log('resp', resp)
+					if(resp.status === 200) {
+						self.location = '/purchase/m/order/list/'
+					} else {
+						Jalert('请重试！', 'icon-error')
+					}
+				})
+			}).catch((err) => {
+				Loading('hide')
+				console.log('err', err)
+				Jalert('请重试！', 'icon-error')
+			})
+		},
 	},
+
 	ready() {
 		this.csrftoken = document.cookie.match(/csrftoken=\w+/g)[0].replace(/csrftoken=/, '')
 		this.orderId = /detail\/\d+/.exec(location.href)[0].replace('detail\/', '')
-		let vm = this
+		Loading('show')
+		let vm = this	
 		//加载订单详情
 		fetch('/purchase/api/order/' + this.orderId, {
 			method: 'GET',
@@ -228,7 +257,7 @@ export default {
 				} else if(resp.order_state === 3) {
 					vm.statusName = '下单成功'
 					vm.footerDisp = 'block'
-					vm.footerMode = 1
+					vm.footerMode = 0
 				} else if(resp.order_state === 4) {
 					vm.statusName = '等待收货'
 					vm.footerDisp = 'block'
@@ -246,12 +275,14 @@ export default {
 					vm.footerDisp = 'none'
 				}
 				vm.total = resp.total
-				vm.createTime = resp.create_time.split('T')
+				vm.createTime = resp.create_time.replace('T', '\ ')
 				vm.orderSkus = resp.order_skus
+				Loading('hide')
+			}).catch(err => {
+				Loading('hide')
 			})
 		})
 	},
-
 
 }
 </script>

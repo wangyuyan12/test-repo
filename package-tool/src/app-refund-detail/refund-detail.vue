@@ -1,5 +1,4 @@
 <style lang="less">
-
 	.info {
 		// position: relative;
 		width: 100%;
@@ -92,7 +91,6 @@
 	<div  v-if="footType === 2"  class="footer confirm">
 		<input type="button" @click="signedRefund" class="checked-good" value="确认收货">
 	</div>
-	
 </template>
 
 <script>
@@ -156,22 +154,25 @@ export default {
 				},
 				body: JSON.stringify(param)
 			}).then((res) => {
+				Loading('hide')
 				res.json().then((resp) => {
 					vm.refundStatus = vm.stateList[resp.refund_state]
 					vm.footType = 0
 				}).catch(err => {
-					alert('修改失败请重试！')
+					Jalert('请重试！', 'icon-error')
 				})
 				
 			}).catch((err) => {
+				Loading('hide')
 				console.log('err', err)
-				alert('修改失败请重试！')
+				Jalert('请重试！', 'icon-error')
 			})
 		},
 
 		rejectAppeal() {
 			let con = confirm('拒绝退货？')
 			if(con) {
+				Loading('show')
 				this.modifyRefundStatus({'refund_state': 12}, this)
 			} else {
 				return
@@ -181,6 +182,7 @@ export default {
 		acceptAppeal() {
 			let con = confirm('同意退货？')
 			if(con) {
+				Loading('show')
 				this.modifyRefundStatus({}, this)
 			} else {
 				return
@@ -190,6 +192,7 @@ export default {
 		signedRefund() {
 			let con = confirm('确认收货')
 			if(con) {
+				Loading('show')
 				this.modifyRefundStatus({'refund_state': 10}, this)
 			} else {
 				return
@@ -214,7 +217,7 @@ export default {
 
 		this.orderId = location.href.split('/').pop()
 		let vm = this
-
+		Loading('show')
 		this.connectWebViewJavascriptBridge((bridge) => {
 			bridge.init((message, responseCallback) => {
 				//获取token
@@ -251,9 +254,11 @@ export default {
 						vm.address = resp.shop.address
 						vm.contact = resp.shop.contact
 						vm.phone = resp.shop.phone
+						vm.loading = false
 					})
 				}).catch((err) => {
-					alert(err)
+					Loading('hide')
+					Jalert('请重试！', 'icon-error')
 				})
 			})
 		})	

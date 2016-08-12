@@ -7,7 +7,6 @@
     clear: both;
     content: " ";
 }
-
 .prod-detail {
 	position: relative;
 	padding: 13px 15px;

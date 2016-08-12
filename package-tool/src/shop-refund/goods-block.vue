@@ -1,4 +1,9 @@
 <style lang="less">
+	input[type=button]{
+		-webkit-appearance: none;
+		outline: none;
+		padding: 0;
+	}
 	.tz-no-wrap{
 		white-space: nowrap; 
 		text-overflow:ellipsis; 
