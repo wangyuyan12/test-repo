@@ -94,8 +94,8 @@
 </template>
 
 <script>
-import fetch from 'isomorphic-fetch'
 import prodItem from './prod-item.vue'
+import reqwest from 'reqwest'
 
 export default {
 	name: 'orderDetail',
@@ -223,7 +223,45 @@ export default {
 				//获取token
 				vm.token = 'token\ \ ' + message
 				//请求数据
-				fetch('/purchase/api/proxy/refundorder/' + vm.orderId, {
+				reqwest({
+                        url: '/purchase/api/proxy/refundorder/' + vm.orderId,
+                        contentType: "application/json;charset=utf-8;",
+                        method: 'GET',
+                        headers: {
+                            'Authorization': vm.token,
+                        },
+                        error: function (err) { 
+                        	Loading('hide')
+							Jalert('请重试！', 'icon-error')
+                        },
+                        success: function(resp) {
+                        	Loading('hide')
+                            vm.refundNo = resp.number
+							vm.refundStatus = vm.stateList[resp.refund_state]
+							if(resp.refund_state === 1 ||
+								resp.refund_state === 3 ||
+								resp.refund_state === 4 ||
+								resp.refund_state === 7) {
+								vm.footType = 1
+							} else if(resp.refund_state === 9) {
+								vm.footType = 2
+							}
+							vm.sum = parseFloat(resp.price)*resp.num
+							vm.createTime = resp.create_time.replace('T', '\ ')
+							let prodInfo = {}
+							prodInfo.sku = resp.sku
+							prodInfo.num = resp.num
+							prodInfo.price = parseFloat(resp.price)
+							vm.prods.push(prodInfo)
+							vm.shopName = resp.shop.name
+							vm.city = resp.shop.area.name
+							vm.address = resp.shop.address
+							vm.contact = resp.shop.contact
+							vm.phone = resp.shop.phone
+							vm.loading = false
+                        }
+                    })
+				/*fetch('/purchase/api/proxy/refundorder/' + vm.orderId, {
 					method: 'GET',
 					credentials: 'include',
 					headers: {
@@ -231,6 +269,7 @@ export default {
 					}
 				}).then((res) => {
 					res.json().then((resp) => {
+						Loading('hide')
 						console.log('data', resp)
 						vm.refundNo = resp.number
 						vm.refundStatus = vm.stateList[resp.refund_state]
@@ -259,7 +298,7 @@ export default {
 				}).catch((err) => {
 					Loading('hide')
 					Jalert('请重试！', 'icon-error')
-				})
+				})*/
 			})
 		})	
 	},

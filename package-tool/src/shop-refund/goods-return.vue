@@ -1,6 +1,4 @@
 <style lang="less">
-@import '../common/loading/loading.css';
-
 	.page-wrapper {
 		position: relative;
 		background-color: #fff;
@@ -56,13 +54,6 @@
 			</span> -->
 			<span class="goods-operate" :style="{backgroundColor: enabelRefund ? '#30b3fb' : '#d9d9d9'}" @click="refundApply" >确认退货</span>
 		</div>
-		<div v-if="loading" class="load-wrapp">
-	        <div class="load load-1">
-	            <div class="line"></div>
-	            <div class="line"></div>
-	            <div class="line"></div>
-	        </div>
-	    </div>
 	</div>
 </template>
 
@@ -81,13 +72,12 @@ export default {
 			orderId: 0,
 			prods: [],
 			refundProds: [],  //选退货产品
-			loading: true,
 		}
 	},
 	methods: {
 		refundApply() {
 			let vm = this
-			vm.loading = true
+			Loading('show')
 			if(this.enabelRefund) {
 				fetch('/purchase/api/shop/refundorder/apply/' + this.orderId, {
 					method: 'POST',
@@ -100,7 +90,7 @@ export default {
 				}).then((res) => {
 					res.json().then((resp) => {
 						console.log('resp', resp)
-						vm.loading = false
+						Loading('hide')
 						if(resp.status === 201) {
 							// Jalert('退货成功', 'icon-ok')
 							location.href = '/purchase/m/order/list/'
@@ -109,7 +99,7 @@ export default {
 					})
 				}).catch((err) => {
 					console.log(err)
-					vm.loading = false
+					Loading('hide')
 					Jalert('请重试', 'icon-error')
 				})
 			}
@@ -133,6 +123,7 @@ export default {
 		this.csrftoken = document.cookie.match(/csrftoken=\w+/g)[0].replace(/csrftoken=/, '')
 		this.orderId = /refund\/\d+/.exec(location.href)[0].replace('refund\/', '')
 		let vm = this
+		Loading('show')
 		//加载订单详情
 		fetch('/purchase/api/shop/refund/apply/' + vm.orderId, {
 			method: 'GET',
@@ -141,9 +132,9 @@ export default {
 				'X-CSRFTOKEN': vm.csrftoken,
 			}
 		}).then((res) => {
-			Loading('hide')
 			res.json().then((resp) => {
-				console.log('resp', resp)
+				Loading('hide') 
+				console.log('resp1', resp)
 				vm.prods = resp	
 			})
 		}).catch((err) => {

@@ -52,7 +52,8 @@
 		}
 		.other-status {
 			display: inline-block;
-			width: 49%;
+			width: 50%;
+			float: left;
 		}
 		.left {
 			background-color: #fff;
@@ -112,7 +113,7 @@
 	.express-info {
 		display: none;
 		position: fixed;
-		top: 30%;
+		top: 20%;
 		width: 100%;
 		height: 23rem;
 		z-index: 1001;
@@ -132,7 +133,6 @@
 			input {
 				border: 1px solid #d9d9d9;
 				margin-bottom: 1.5rem;
-				border-radius: 5px;
 				padding-left: 5px;
 				height: 3.5rem;
 				width: 24rem;

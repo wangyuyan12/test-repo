@@ -19,6 +19,7 @@
   "dependencies": {
     "isomorphic-fetch": "^2.2.1",
     "jquery": "^3.0.0",
+    "reqwest": "^2.0.5",
     "vue": "^1.0.24",
     "vue-router": "^0.7.13"
   },
