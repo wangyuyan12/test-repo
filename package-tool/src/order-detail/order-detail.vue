@@ -38,7 +38,6 @@
 		position: fixed;
 		bottom: 0;
 		width: 100%;
-		margin-top: 1px solid #d9d9d9;
 		line-height: 4.5rem;
 		font-size: 1.6rem;
 		text-align: center;
@@ -52,7 +51,8 @@
 		}
 		.other-status {
 			display: inline-block;
-			width: 49%;
+			float: left;
+			width: 50%;
 		}
 		.left {
 			background-color: #fff;
@@ -127,7 +127,9 @@
 			<span class="sum">订单总额：&nbsp;￥{{ total }}</span><br>
 			<!-- <span class="deposit">定金金额：&nbsp;￥360</span><br> -->
 			<span class="order-num">订单编号：&nbsp;{{ orderNum }}</span><br>
-			<span class="order-create">订单创建时间：&nbsp;{{ createTime }}</span>
+			<span class="order-create">订单时间：&nbsp;{{ createTime }}</span><br>
+			<span v-if="deliveryTime" class="order-create">发货时间：&nbsp;{{ deliveryTime }}</span><br>
+			<span v-if="finishTime" class="order-create">成交时间：&nbsp;{{ finishTime }}</span><br>
 		</div>
 		<div class="footbar" :style="{display: footerDisp}">
 			<div v-if="footerMode === 0">
@@ -145,6 +147,10 @@
 			<div v-if="footerMode === 3">
 				<a href='/purchase/m/order/refund/{{orderId}}'><span class="other-status left">申请退货</span></a>
 				<span class="other-status right" @click="callCompany">联系商业公司</span>
+			</div>
+			<div v-if="footerMode === 4">
+				<a href="/purchase/m/order/cancel/{{orderId}}"><span v-else class="other-status left">取消订单</span></a>
+				<span class="other-status right" @click="callCompany">联系商业公司</span>
 			</div>	
 		</div>
 	</div>
@@ -161,7 +167,7 @@
 </template>
 
 <script>
-import fetch from 'isomorphic-fetch'
+import reqwest from 'reqwest'
 import orderBlock from './order-block.vue'
 
 export default {
@@ -180,6 +186,8 @@ export default {
 			orderStatus: 0,
 			companyName: '--',
 			createTime: '--',
+			deliveryTime: null,
+			finishTime: null,
 			orderSkus: [],
 			statusName: '未提交',
 			footerDisp: 'block',
@@ -199,16 +207,15 @@ export default {
 			//取消订单接口
 			let vm = this
 			Loading('show')
-			fetch('/purchase/api/shop/order/update/' + this.orderId, {
+			reqwest({
+				url: '/purchase/api/shop/order/update/' + this.orderId, 
 				method: 'PATCH',
-				credentials: 'include',
+				contentType: "application/json",
 				headers: { 
-					'Content-Type': 'application/json',
 					'X-CSRFTOKEN': this.csrftoken,
 				},
-				body: JSON.stringify({order_state: 5})
-			}).then((res) => {
-				res.json().then((resp) => {
+				data: JSON.stringify({order_state: 5})
+			}).then(resp => {
 					Loading('hide')
 					console.log('resp', resp)
 					if(resp.status === 200) {
@@ -216,8 +223,7 @@ export default {
 					} else {
 						Jalert('请重试！', 'icon-error')
 					}
-				})
-			}).catch((err) => {
+			}).fail((err) => {
 				Loading('hide')
 				console.log('err', err)
 				Jalert('请重试！', 'icon-error')
@@ -231,14 +237,13 @@ export default {
 		Loading('show')
 		let vm = this	
 		//加载订单详情
-		fetch('/purchase/api/order/' + this.orderId, {
+		reqwest({
+			url: '/purchase/api/order/' + this.orderId, 
 			method: 'GET',
-			credentials: 'include',
 			headers: {
 				'X-CSRFTOKEN': this.csrftoken,
 			}
-		}).then(function(res) {
-			res.json().then(function(resp) {
+		}).then(resp => {
 				console.log('resp', resp)
 				vm.orderNum = resp.number
 				vm.companyName = resp.company.name
@@ -253,11 +258,12 @@ export default {
 					vm.footerMode = 1
 				} else if(resp.order_state === 2) {
 					vm.statusName = '等待厂家审核'
-					vm.footerDisp = 'none'
+					vm.footerDisp = 'block'
+					vm.footerMode = 4
 				} else if(resp.order_state === 3) {
 					vm.statusName = '下单成功'
 					vm.footerDisp = 'block'
-					vm.footerMode = 0
+					vm.footerMode = 4
 				} else if(resp.order_state === 4) {
 					vm.statusName = '等待收货'
 					vm.footerDisp = 'block'
@@ -269,19 +275,24 @@ export default {
 				} else if(resp.order_state === 6) {
 					vm.statusName = '有退货'
 					vm.footerDisp = 'block'
-					vm.footerMode = 0
+					vm.footerMode = 3
 				} else if(resp.order_state === 10) {
 					vm.statusName = '完成交易后订单关闭'
 					vm.footerDisp = 'none'
 				}
 				vm.total = resp.total
 				vm.createTime = resp.create_time.replace('T', '\ ')
+				if(resp.delivery_time) {
+					vm.deliveryTime = resp.delivery_time.replace('T', '\ ')
+				}
+				if(resp.finish_time) {
+					vm.finishTime = resp.finish_time.replace('T', '\ ')
+				}
 				vm.orderSkus = resp.order_skus
 				Loading('hide')
-			}).catch(err => {
+			}).fail(err => {
 				Loading('hide')
 			})
-		})
 	},
 
 }

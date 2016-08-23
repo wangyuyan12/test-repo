@@ -1,0 +1,54 @@
+{% extends '../layout/base.html' %}
+{% block title %}用户登入{% endblock %}
+{% block content %}
+  <style>
+    .login {
+      border: 2px solid gray;
+      width: 50%;      
+    }
+  </style>
+
+	 <div class="login">
+    <label>用户名：</label>
+    <input type="text" class="user" id="user" placeholder="请输入帐号"><br>
+    <label>密码</label>
+    <input type="password" class="pwd" id="pwd" placeholder="密码"><br>
+    <input type="button" id="to-login" value="登入"> <br>
+   </div>
+  </body>
+  <!-- <script src='http://res.wx.qq.com/open/js/jweixin-1.0.0.js'></script> -->
+  <script src='/static/common/md5.js'></script>
+  <script>
+  /*var csrftoken = document.cookie.match(/csrftoken=\w+/ig)[0].replace(/csrftoken=/, '')*/
+
+  var csrftoken = document.cookie.match(/csrfnode=[\w-]+/g)[0].replace(/csrfnode=/, '')
+  console.log('csrfnode', csrftoken)
+  var getLoginfo = function() {
+    var userInfo = {}
+    userInfo.account = document.getElementById('user').value
+
+    userInfo.password =  document.getElementById('pwd').value
+    userInfo.password = md5(userInfo.password)
+    return userInfo
+  }
+
+  document.getElementById('to-login').addEventListener('click', function() {
+    var logInfo = getLoginfo()
+    fetch('/login', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-csrf-token': csrftoken,
+      },
+      body: JSON.stringify(logInfo)
+    }).then((res) => {
+      if(res.status === 200) {
+        location.href = res.url
+      } else {
+        alert('账号or密码错误')
+      }
+    })
+  })
+</script>
+{% endblock %}

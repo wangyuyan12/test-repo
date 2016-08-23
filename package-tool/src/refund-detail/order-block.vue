@@ -89,6 +89,7 @@
 				color: #2fb1fd;
 				float: left;
 				bottom: .8rem;
+				width: 80%;
 				img {
 					height: 1.4rem;
 					vertical-align: -10%;
@@ -141,7 +142,7 @@
 			<div class="prod-info">
 				<span class="detail no-wrap">剂型：&nbsp;{{ orderInfo.sku.dosage_form }}</span>
 				<span class="detail no-wrap">规格：&nbsp;{{ orderInfo.sku.specs }}</span> <br>
-				<span class="detail no-wrap">单价：&nbsp;￥{{ orderInfo.price }}</span>
+				<span class="detail no-wrap">单价：&nbsp;￥{{ orderInfo.price | formatPrice }}</span>
 				<span class="detail no-wrap">数量：&nbsp;{{ orderInfo.num }}</span> <br>
 				<span class="sum">总计</span> <br>
 
@@ -149,7 +150,7 @@
 					<img src="./resource/phone.png" alt="">
 					厂家：&nbsp;{{ orderInfo.sku.factory }}
 				</span>
-				<span class="sum">￥{{ sum }}</span>
+				<span class="sum">￥{{ sum | formatPrice }}</span>
 			</div>
 		</div>
 
@@ -196,6 +197,11 @@ export default {
 	beforeCompile() {
 		this.sum = parseFloat( this.orderInfo.price ) * parseFloat( this.orderInfo.num )
 		this.pic = this.orderInfo.sku.pic ? this.orderInfo.sku.pic : '//static.eyaos.com/images/no_product.png'
+	},
+	filters: {
+		formatPrice (price) {
+			return Number(price).toFixed(2)
+		},
 	}
 
 }

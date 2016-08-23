@@ -97,11 +97,11 @@ module.exports = {
     }, {
       test: /\.less$/,
       loader: ExtractTextPlugin.extract('style-loader', 
-        'css-loader?sourceMap!less-loader?sourceMap'),
+        'css-loader?sourceMap!less-loader?sourceMap!autoprefixer-loader?safe=true'),
       include: __dirname
     }, {
       test: /\.css$/,
-      loader: ExtractTextPlugin.extract('style-loader', 'css-loader?sourceMap'),
+      loader: ExtractTextPlugin.extract('style-loader', 'css-loader?sourceMap!autoprefixer-loader?safe=true'),
       include: __dirname
     }, {
       test: /\.(jpe?g|png|gif|svg)$/i, 

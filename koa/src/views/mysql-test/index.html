@@ -1,22 +1,18 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
-    <title>Mysql Test</title>
-    <style>
-    	.weixin {
+{% extends '../layout/base.html' %}
+{% block title %}mysql test{% endblock %}
+{% block content %}
+  <style>
+      .weixin {
         border: 2px solid gray;
         width: 50%;
         
       }
     </style>
-  </head>
-  <body>
 	 <div class="weixin">
+   <p>异步请求测试</p>
     <input type="button" id="test1" value="Send Post"> <br>
+    <input type="button" id="test2" value="PATCH"> <br>
+    <input type="button" id="test3" value="GET"> <br>
    </div>
    <span id='csrf'>{{ csrf }}</span>
   </body>
@@ -35,6 +31,21 @@
     shopId: 3,
     authNum: 2,
   }
+  
+
+   document.getElementById('test3').addEventListener('click', function() {
+    fetch('/mysql-test/select/' + 6, {
+      method: 'GET',
+      credentials: 'include',
+      headers: { 
+        'x-csrf-token': csrftoken,
+      },
+    }).then((res) => {
+      res.json().then((resp) => {
+        console.log('resp', resp)
+      })
+    })
+  })
 
   document.getElementById('test1').addEventListener('click', function() {
     fetch('/mysql-test/insert', {
@@ -51,5 +62,21 @@
       })
     })
   })
+
+  document.getElementById('test2').addEventListener('click', () => {
+    fetch('/mysql-test/update/' + 39, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-csrf-token': csrftoken,
+      },
+      body: JSON.stringify({orderState: 5}),
+    }).then(res => {
+      console.log('resp', res)
+    }).catch(err => {
+      alert('err', err)
+    })
+  })
 </script>
- </html>
+{% endblock %}

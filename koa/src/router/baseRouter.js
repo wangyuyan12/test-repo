@@ -18,9 +18,27 @@ const ImgCompress = require('../app/img-compress/img-comp')
 router.get('/', co.wrap(function* (ctx, next) {
 	logger.debug('in /')
 	logger.debug('ctx', ctx.method)
-	// logger.debug('body', ctx.session)
+	logger.debug('session', ctx.session)
 	// logger.debug('csrf', ctx.assertCSRF)
 	ctx.body = 'hello feifeiyu ok'
+}))
+
+router.get('/login', co.wrap(function* (ctx, next) {
+	yield ctx.render('login/index')
+}))
+
+router.post('/login', co.wrap(function* (ctx, next) {
+	logger.debug('in post login')
+	logger.debug('request', ctx.request.body)
+	let mysqlTest = new MysqlTest()
+	let isLogin = yield mysqlTest.loginOperate(ctx)
+	logger.debug('session', ctx.session)
+	if(isLogin) {
+		ctx.redirect('/')
+	} else {
+		ctx.status = 401
+		ctx.body = JSON.stringify({status: 401, login: false})
+	}
 }))
 
 router.get('/wechat/token', co.wrap(function* (ctx, next) {
@@ -53,7 +71,7 @@ router.get('/mysql-test/select/:id', co.wrap(function* (ctx, next) {
 	let id = ctx.params.id
 	let mysqlTest = new MysqlTest()
 	let result = yield mysqlTest.queryById({id: id})
-
+	logger.debug('result', result)
 	ctx.body = JSON.stringify(result)
 
 }))
@@ -70,8 +88,14 @@ router.post('/mysql-test/insert', co.wrap(function* (ctx, next) {
 	let mysqlTest = new MysqlTest()
 	let result = yield mysqlTest.insertItem(ctx)
 	result.status = 200
-	ctx.body = result
+	ctx.body = JSON.stringify(result)
 
+}))
+router.patch('/mysql-test/update/:id', co.wrap(function* (ctx, next) {
+	logger.info('in mysql-test/insert patch')
+	let mysqlTest = new MysqlTest()
+	let result = yield mysqlTest.updateOrderState(ctx, ctx.params.id)
+	ctx.body = result
 }))
 router.get('/redis-test', co.wrap(function* (ctx, next) {
 	logger.debug('in /redis-test')
@@ -88,7 +112,7 @@ router.get('/upload/img', co.wrap(function* (ctx, next) {
 
 router.post('/upload/img', co.wrap(function* (ctx, next) {
 	logger.debug('in /upload/img')
-	
+
 	let parts = parse(ctx)
 	let part = null
 	let imgComp = new ImgCompress()
@@ -113,8 +137,14 @@ router.post('/upload/img', co.wrap(function* (ctx, next) {
 	}
 
 	ctx.body = JSON.stringify(result)
-
 }))
 
+router.get('/flex', co.wrap(function* (ctx, next) {
+	yield ctx.render('flex/index')
+}))
+
+router.get('/test', co.wrap(function* (ctx, next) {
+	yield ctx.render('test/rppn')
+}))
 
 module.exports = router 

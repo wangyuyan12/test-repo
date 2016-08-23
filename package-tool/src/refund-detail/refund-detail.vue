@@ -38,7 +38,6 @@
 		position: fixed;
 		bottom: 0;
 		width: 100%;
-		margin-top: 1px solid #d9d9d9;
 		line-height: 4.5rem;
 		font-size: 1.6rem;
 		text-align: center;
@@ -163,6 +162,46 @@
 
 	}
 
+	.confirm-cover {
+		position: fixed;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		left: 0;
+		z-index: 1001;
+		background: rgba(0, 0, 0, 0.3);
+		display: none;
+		.confirm-win {
+			margin: 30% auto 0;
+			top: 30%;
+			width: 26rem;
+			height: 14rem;
+			background-color: #fff;
+			border-radius: 4px;
+			text-align: center;
+			font-size: 1.6rem;
+			color: #000;
+			span {
+				line-height: 9.5rem;
+			}
+			.confirm-operate {
+				line-height: 4.5rem;
+				border-top: 1px solid #d9d9d9;
+				input {
+					width: 49%;
+					color: #30b2fb;
+					border: 0;
+    				background: none;
+    				line-height: 4.3rem;
+				}
+				input:first-of-type {
+					color: #000;
+					border-right: 1px solid #d9d9d9;
+				}
+			}			
+		}
+	}
+
 </style>
 
 <template>
@@ -181,14 +220,14 @@
 			<!-- <span class="deposit">平台退款：&nbsp;￥{{ deposit }}</span><br>
 			<span class="deposit">厂家退款：&nbsp;￥{{ remain }}</span><br> -->
 			<span class="order-num">退货订单号：&nbsp;{{ orderNum }}</span><br>
-			<span class="order-create">订单创建时间：&nbsp;{{ createTime }}</span>
+			<span class="order-create">创建时间：&nbsp;{{ createTime }}</span>
 		</div>
 		<div class="footbar" :style="{display: footerDisp}">
 			<div v-if="footerMode === 0">
 				<span class="contact-comp" @click="callCompany">联系商业公司</span>
 			</div>
 			<div v-if="footerMode === 1"> 
-				<span class="other-status left" @click="refundCancel">取消退货</span>
+				<span class="other-status left" @click="confirmOperate(2)">取消退货</span>
 				<span class="other-status right" @click="callCompany">联系商业公司</span>
 			</div>
 			<div v-if="footerMode === 2">
@@ -196,7 +235,7 @@
 				<span class="other-status right" @click="callCompany">联系商业公司</span>
 			</div>
 			<div v-if="footerMode === 3">
-				<span class="other-status left" @click="appealApply">申请客服介入</span>
+				<span class="other-status left" @click="confirmOperate(3)">申请客服介入</span>
 				<span class="other-status right" @click="callCompany">联系商业公司</span>
 			</div>	
 			<div v-if="footerMode === 4">
@@ -204,7 +243,7 @@
 				<span class="other-status right" @click="callCompany">联系商业公司</span>
 			</div>
 			<div v-if="footerMode === 5">
-				<span class="contact-comp" @click="callCompany">已结束</span>
+				<span class="contact-comp">已结束</span>
 			</div>
 		</div>
 	</div>
@@ -231,11 +270,19 @@
 			</p>
 		</div>
 	</div>
-	
+	<div class="confirm-cover" :style="{display: showConfirm}">
+		<div class="confirm-win">
+			<span>{{ confirmText }}</span> <br>
+			<div class="confirm-operate">
+				<input type="button" class="concel"  @click="confirmOperate(0)" value="取消">
+				<input type="button" class="call" @click="confirmOperate(1)" value="确定">
+			</div>
+		</div>
+	</div>
 </template>
 
 <script>
-import fetch from 'isomorphic-fetch'
+import reqwest from 'reqwest'
 import orderBlock from './order-block.vue'
 
 export default {
@@ -268,6 +315,9 @@ export default {
 			expressNum: '',
 			expressColor: '#d9d9d9',
 			expressNumColor: '#d9d9d9',
+			confirmState: 0,
+			confirmText: '',
+			showConfirm: 'none',
 		}
 	},
 	methods: {
@@ -279,25 +329,43 @@ export default {
 			this.showCall = 'none'
 			this.showCover = 'none'
 		},
-		refundOperate(param) {
-			let vm = this
+		confirmOperate(state) {
+			if(state === 0) {
+				this.showConfirm = 'none'
+				return
+			} else if(state === 1) {
+				this.showConfirm = 'none'
+				if(this.confirmState === 1) {
+					this.refundOperate(this, {refund_state: 0})
+				} else if(this.confirmState === 2) {
+					this.refundOperate(this, {refund_state: 14})
+				}
+			} else if(state === 2) {
+				this.confirmState = 1
+				this.confirmText = '确认取消退货？'
+				this.showConfirm = 'block'
+			} else if(state === 3) {
+				this.confirmState = 2
+				this.confirmText = '确认申请客服接入？'
+				this.showConfirm = 'block'
+			}
+		},
+		refundOperate(vm, param) {
 			Loading('show')
-			fetch('/purchase/api/shop/refundorder/' + this.refundId, {
+			reqwest({
+				url: '/purchase/api/shop/refundorder/' + this.refundId, 
 				method: 'PATCH',
-				credentials: 'include',
+				contentType: "application/json;",
 				headers: {
-					'Content-Type': 'application/json',
 					'X-CSRFTOKEN': this.csrftoken,
 				},
-				body: JSON.stringify(param)
-			}).then((res) => {
-				res.json().then((resp)=> {
-					console.log('resp', resp)
-					Loading('hide')
-					vm.statusSetting(resp.refund_state)
-					vm.cancelSubmit() //关闭弹窗
-				})
-			}).catch((err) => {
+				data: JSON.stringify(param)
+			}).then(resp => {
+				console.log('resp', resp)
+				Loading('hide')
+				vm.statusSetting(resp.refund_state)
+				vm.cancelSubmit() //关闭弹窗
+			}).fail((err) => {
 				console.log(err)
 				Loading('hide')
 				Jalert('请重试！', 'icon-error')
@@ -308,9 +376,6 @@ export default {
 		},
 		onExpressNumInput() {
 			this.expressNumColor = '#d9d9d9'
-		},
-		refundCancel() {
-			this.refundOperate({refund_state: 0})
 		},
 		submitExpressInfo() {
 			console.log('express', this.express, 'express_num', this.expressNum)
@@ -324,7 +389,7 @@ export default {
 				this.expressColor === 'red') {
 				return
 			}
-			this.refundOperate({refund_state: 9, express: this.express, express_number: this.expressNum})
+			this.refundOperate(this, {refund_state: 9, express: this.express, express_number: this.expressNum})
 		},
 		cancelSubmit() {
 			this.showExpress = 'none'
@@ -333,9 +398,6 @@ export default {
 		expressInfoInput() {
 			this.showExpress = 'block'
 			this.showCover = 'block'
-		},
-		appealApply() {
-			this.refundOperate({refund_state: 14})
 		},
 		statusSetting(stateId) {
 			if(stateId === 1 ||
@@ -356,10 +418,14 @@ export default {
 			} else if(stateId === 10) {
 				this.statusName = '退货成功'
 				this.footerMode = 0
-			} else if(stateId === 11 ||
-				stateId === 12 ||
-				stateId === 13) {
-				this.statusName = '退货失败'
+			} else if(stateId === 11) {
+				this.statusName = '商业公司拒绝退货'
+				this.footerMode = 3
+			} else if(stateId === 12) {
+				this.statusName = '厂家拒绝退货'
+				this.footerMode = 3
+			} else if(stateId === 13) {
+				this.statusName = '平台拒绝退货'
 				this.footerMode = 3
 			} else if(stateId === 14) {
 				this.statusName = '客服介入'
@@ -367,6 +433,9 @@ export default {
 			} else if(stateId === 15) {
 				this.statusName = '退货失败'
 				this.footerMode = 5
+			} else if(stateId === 0 ) {
+				this.statusName = '取消退货'
+				location.href = '/purchase/m/order/refund/list/'
 			}
 		}
 
@@ -377,31 +446,29 @@ export default {
 		let vm = this
 		Loading('show')
 		//加载订单详情
-		fetch('/purchase/api/shop/refundorder/' + this.refundId, {
+		reqwest({
+			url: '/purchase/api/shop/refundorder/' + this.refundId, 
 			method: 'GET',
-			credentials: 'include',
 			headers: {
 				'X-CSRFTOKEN': this.csrftoken,
 			}
-		}).then(function(res) {
-			res.json().then(function(resp) {
-				console.log('resp', resp)
-				vm.statusSetting(resp.refund_state)
-				vm.orderSkus = [{
-					sku: resp.sku,
-					price: resp.price,
-					num: resp.num,
-					phone: resp.enterprise.phone,
-					enterprise: resp.enterprise.name,
-				}]
-				vm.companyName = resp.company.name
-				vm.total = resp.total
-				vm.deposit = resp.deposit
-				vm.remain = resp.remain
-				vm.orderNum = resp.number
-				vm.createTime = resp.create_time.replace('T', '\ ')
-				Loading('hide')
-			})
+		}).then(resp => {
+			console.log('resp', resp)
+			vm.statusSetting(resp.refund_state)
+			vm.orderSkus = [{
+				sku: resp.sku,
+				price: resp.price,
+				num: resp.num,
+				phone: resp.enterprise.phone,
+				enterprise: resp.enterprise.name,
+			}]
+			vm.companyName = resp.company.name
+			vm.total = resp.total
+			vm.deposit = resp.deposit
+			vm.remain = resp.remain
+			vm.orderNum = resp.number
+			vm.createTime = resp.create_time.replace('T', '\ ')
+			Loading('hide')
 		})
 	},
 

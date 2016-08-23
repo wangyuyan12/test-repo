@@ -5,11 +5,6 @@ let tinify = require('tinify')
 
 tinify.key = '2uSJ85HslmmX2woBc6lara705BCv0rxf'
 
-/*let source = tinify.fromFile('../../../public/upload/Ho97c457NkTCie89_uLP.jpg')
-source.toFile('../../../public/upload/tiny/Ho97c457NkTCie89_uLP.jpg')
-
-let files = fs.readdirSync('../../../public/upload/')*/
-
 class ImageCompress {
 	constructor() {
 		

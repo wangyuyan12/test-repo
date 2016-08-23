@@ -1,0 +1,65 @@
+{% extends '../layout/base.html' %}
+{% block title %}FlexBox{% endblock %}
+{% block styleLink %} 
+  <link rel="stylesheet" href="{{staticPath}}/flex/flex.css">
+{% endblock %}
+{% block content %}
+	   <div class="face first">
+       <span class="pip"></span>
+     </div>
+     <div class="face second">
+       <span class="pip"></span>
+       <span class="pip pip-two"></span>
+     </div>
+     <div class="face third">
+       <span class="pip"></span>
+       <span class="pip pip-two"></span>
+       <span class="pip pip-three"></span>
+     </div>
+     <div class="face forth">
+      <div class="column">
+        <span class="pip">1</span>
+        <span class="pip pip-two">2</span>
+      </div>
+      <div class="column">
+        <span class="pip pip-three">3</span>
+        <span class="pip pip-four">4</span>
+      </div>
+     </div>
+     <div class="face sixth">
+      <div class="column">
+        <span class="pip pip-1">1</span>e
+        <span class="pip pip-2">2</span>
+        <span class="pip pip-3">3</span>
+      </div>
+      <div class="column">
+        <span class="pip pip-4">4</span>
+      </div>
+      <div class="column">
+        <span class="pip pip-5">5</span>
+        <span class="pip pip-6">6</span>
+      </div>
+     </div>
+      <br>
+     <div class="grid">
+       <div class="grid-cell">full</div>
+     </div>
+     <div class="grid">
+       <div class="grid-cell u-1of2">1/2</div>
+       <div class="grid-cell u-1of2">1/2</div>
+     </div>
+      
+    <div class="input-style">
+      <div class="input-addon">
+        <span class="input-addon-item">Amount</span>
+        <input type="text" class="input-addon-field" value="Example">
+        <span class="input-addon-item">Encrypt</span>
+      </div>
+      <div class="input-addon2">
+        <span>Name:</span><input type="text" placeholder="okok">
+        <span>Age:</span><input type="text" placeholder="okok">
+        <div class="ok">okokokokokokokokokokokokokokookokokokookokokokokokokokoko </div><br><div class="ok">nono</div>
+      </div>
+    </div>
+    <script src="{{staticPath}}/flex/flex.bundle.js" ></script>
+{% endblock %}

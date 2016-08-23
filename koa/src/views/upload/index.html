@@ -1,15 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Upload</title>
-  <style>
-    body {
-      padding: 50px;
-      font: 14px Helvetica, Arial;
-    }
-  </style>
-</head>
-<body>
+{% extends '../layout/base.html' %}
+{% block title %}Upload{% endblock %}
+{% block content %}
   <h1>File Upload</h1>
   <p>Try uploading multiple files at a time.</p>
   <!-- <iframe style="display:none" name="csrf-frame"></iframe>
@@ -129,5 +120,4 @@
     
     
   </script>
-</body>
-</html>
+{% endblock %}

@@ -19,7 +19,7 @@ class MysqlTest {
 	queryById(param){
 		logger.debug('in QueryById', param)
 
-		let result = co.wrap(function*() {  //获取查询结果
+		/*let result = co.wrap(function*() {  //获取查询结果
 			try {
 				let resp = yield this.mysqlDao.queryById(param)
 				logger.debug('in queryById yield', resp)
@@ -27,10 +27,11 @@ class MysqlTest {
 			} catch(err) {
 				logger.error(err)
 			}
-		})
+		})*/
 
 		//采用以下写法可以防止栈溢出的情形
-		return Promise.resolve().then(() => result)
+		// return Promise.resolve().then(() => result)
+		return this.mysqlDao.queryById(param)
 	}
 
 	insertItem(ctx){
@@ -51,6 +52,33 @@ class MysqlTest {
 		logger.debug('param', param)
 
 		return this.mysqlDao.insert(param)
+	}
+
+	updateOrderState(ctx, id) {
+		logger.debug('in updateItem')
+		let param = {}
+		param.order_state = ctx.request.body.orderState
+		return this.mysqlDao.updateById(param, id)
+	}
+
+	loginOperate(ctx) {
+		logger.debug('in loginOperate')
+		let param = {}
+		param.account = ctx.request.body.account
+		param.password = ctx.request.body.password
+		let $this = this
+		return co(function* () {
+			let result = yield $this.mysqlDao.userQuery(param)
+			logger.debug('result', result)
+			if(result[0] && result[0].account === param.account) {
+				ctx.session.account = result[0].account
+				ctx.session.role = 'admin'
+				logger.debug('session', ctx.session)
+				return Promise.resolve().then(() => true)
+			} 
+			return Promise.resolve().then(() => false)
+		})
+		// return this.mysqlDao.userQuery(param)
 	}
 }
 

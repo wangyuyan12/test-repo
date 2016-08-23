@@ -3,16 +3,17 @@
 		position: relative;
 		background-color: #fff;
 		margin-top: 1rem;
+		margin-bottom: 5rem;
 	}
 
 	.footbar {
 		position: fixed;
 		bottom: 0;
-		margin-top: 1px solid #d9d9d9;
 		width: 100%;
 		line-height: 4.5rem;
 		font-size: 1.4rem;
 		text-align: center;
+		background-color: #fff;
 		.select-all {
 			display: inline-block;
 			width: 25%;
@@ -52,13 +53,13 @@
 				</span> 
 				<span class="text">全选</span>
 			</span> -->
-			<span class="goods-operate" :style="{backgroundColor: enabelRefund ? '#30b3fb' : '#d9d9d9'}" @click="refundApply" >确认退货</span>
+			<span class="goods-operate" :style="{backgroundColor: enabelRefund ? '#30b3fb' : '#d9d9d9'}" @click="refundApply">确认退货</span>
 		</div>
 	</div>
 </template>
 
 <script>
-import fetch from 'isomorphic-fetch'
+import reqwest from 'reqwest'
 import goodsBlock from './goods-block.vue'
 
 export default {
@@ -76,32 +77,31 @@ export default {
 	},
 	methods: {
 		refundApply() {
-			let vm = this
-			Loading('show')
 			if(this.enabelRefund) {
-				fetch('/purchase/api/shop/refundorder/apply/' + this.orderId, {
-					method: 'POST',
-					credentials: 'include',
-					headers: {
-						'X-CSRFTOKEN': this.csrftoken,
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify(this.refundProds)
-				}).then((res) => {
-					res.json().then((resp) => {
+				let vm = this
+				Loading('show')
+				if(this.enabelRefund) {
+					reqwest({
+						url: '/purchase/api/shop/refundorder/apply/' + this.orderId, 
+						method: 'POST',
+						contentType: "application/json;",
+						headers: {
+							'X-CSRFTOKEN': this.csrftoken,
+						},
+						data: JSON.stringify(this.refundProds)
+					}).then(resp => {
 						console.log('resp', resp)
 						Loading('hide')
 						if(resp.status === 201) {
 							// Jalert('退货成功', 'icon-ok')
 							location.href = '/purchase/m/order/list/'
-						}
-						
+						}	
+					}).fail((err) => {
+						console.log(err)
+						Loading('hide')
+						Jalert('请重试', 'icon-error')
 					})
-				}).catch((err) => {
-					console.log(err)
-					Loading('hide')
-					Jalert('请重试', 'icon-error')
-				})
+				}
 			}
 		}
 	},
@@ -125,23 +125,20 @@ export default {
 		let vm = this
 		Loading('show')
 		//加载订单详情
-		fetch('/purchase/api/shop/refund/apply/' + vm.orderId, {
+		reqwest({
+			url: '/purchase/api/shop/refund/apply/' + vm.orderId, 
 			method: 'GET',
-			credentials: 'include',
 			headers: {
 				'X-CSRFTOKEN': vm.csrftoken,
 			}
-		}).then((res) => {
-			res.json().then((resp) => {
-				Loading('hide') 
-				console.log('resp1', resp)
-				vm.prods = resp	
-			})
-		}).catch((err) => {
+		}).then(resp => {
+			Loading('hide') 
+			console.log('resp1', resp)
+			vm.prods = resp	
+		}).fail((err) => {
 			Loading('hide')
 			Jalert('请重试！', 'icon-error')
 		})
-
 	},
 	computed: {
 		enabelRefund: function() {

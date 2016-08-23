@@ -119,7 +119,7 @@
 
 		.content-intro {
 			padding: 15px 10px 30px 15px;
-			white-space: pre-wrap;
+			/*white-space: pre-wrap;*/
 		}
 	}
 	
@@ -301,7 +301,7 @@
 			transition='leaveshow'
 		 	v-else>
 			<div class="content-nav">
-				<span :class="isProdCont ? 'selected' : ''" class="selected" @click="contSwitch(true)">图文详情</span>
+				<span :class="isProdCont ? 'selected' : ''" @click="contSwitch(true)">图文详情</span>
 				<span :class="isProdCont ? '' : 'selected'"  @click="contSwitch(false)">规格参数</span>
 			</div>
 			<div class="content-container"
@@ -343,12 +343,12 @@
 				</div>
 			</div>
 		</div>
-		<div v-if='cartStatus' class="cart-operate" transition="showcart">
+		<div v-if='cartStatus===2' class="cart-operate" transition="showcart">
 			<p class="fn-clear">
-				<a href="" class="check-cart">查看购物车</a>
+				<a href="/purchase/m/shoppingcar/" class="check-cart">查看购物车</a>
 				<span class="close" @click="closeCart"></span>
 			</p>
-			<span class="num-operate fn-clear" >采购数量：
+			<span class="num-operate fn-clear" >订货数量：
 				<span class="num-cunt">
 					<span class="sub" @click="subNum"></span>
 					<span class="num">{{ addCartNum }}</span>
@@ -357,15 +357,15 @@
 			</span>
 		</div>
 		<div class="add-cart">
-			<button @click="addCart" :disabled="btnStatus" :style="{backgroundColor: btnStatus ? 'gray' : '#30b3fb'}">{{ cartStatus ? "确定" : '加入购物车' }}</button>
+			<button @click="addCart" :disabled="btnStatus" :style="{backgroundColor: btnStatus ? 'gray' : '#30b3fb'}">{{ cartStatus==2 ? "确定" : (cartStatus==1 ? '加入购物车' : '已下架') }}</button>
 		</div>
-		<div class="cover" :style="{display: cartStatus ? 'block' : 'none'}"></div>
+		<div class="cover" :style="{display: cartStatus==2 ? 'block' : 'none'}"></div>
     </div>
 	
 </template>
 
 <script>
-import fetch from 'isomorphic-fetch'
+import reqwest from 'reqwest'
 import slider from './slider.vue'
 
 export default {
@@ -404,7 +404,7 @@ export default {
 			offsetY: 0,
 			imgs: [],  //先置为空
 			addCartNum: 0,
-			cartStatus: false, //false: 加入购物车; true: 确定
+			cartStatus: 0, //1: 加入购物车; 2: 确定; 0: 下架/库存不足
 			btnStatus: true,
 		}
 	},
@@ -427,6 +427,7 @@ export default {
 			}
 			if(this.offsetY < -100) {
 				this.isPageOne = false
+				// this.isProdCont = true
 			}
 		},
 		touchEndP1(e) {
@@ -469,47 +470,50 @@ export default {
 		},
 		addCart() {
 			
-			if(this.cartStatus) {
+			if(this.cartStatus === 2) {
 				let param = [{id: this.skuId, num: this.addCartNum }]
 				param = JSON.stringify(param)
 				let vm = this
 				Loading('show')
-				fetch('/purchase/api/m/cart/', {
+				reqwest({
+					url: '/purchase/api/m/cart?add=true', 
 					method: 'POST',
-					credentials: 'include',
+					contentType: "application/json;",
 					headers: {
-						'Content-Type': 'application/json',
 						'X-CSRFTOKEN': this.csrftoken,
 					},
-					body: param
-				}).then((res) => {
-					if(res.ok) {
-						res.json().then((resp) => {
-							Loading('hide')
-							if(resp.status === 200) {
-								console.log('cart add success')
-								self.location = '/purchase/m/shoppingcar/'
-							} else {
-								Jalert('请重试！', 'icon-error')
-							}
-						})
+					data: param
+				}).then(resp => {
+					Loading('hide')
+					if(resp.status === 200) {
+						console.log('cart add success')
+						self.location = '/purchase/m/shoppingcar/'
+					} else {
+						Jalert('请重试！', 'icon-error')
 					}
-				}).catch((err) => {
+				}).fail((err) => {
 					Loading('hide')
 					Jalert('请重试！', 'icon-error')
 				})
-				this.cartStatus = false
+				this.cartStatus = 1
 
 			} else {
-				this.cartStatus = true
+				this.cartStatus = 2
 			}
 			
 		},
 		closeCart() {
-			this.cartStatus = false
+			this.cartStatus = 1
 		},
 		addNum() {
-			this.addCartNum = this.addCartNum + this.limitNum
+			let tmpNum = this.addCartNum + this.limitNum
+			if(tmpNum > this.stock) {
+				Jalert('超过库存数量', 'icon-error')
+				return
+			} else {
+				this.addCartNum = tmpNum
+			}
+			
 		},
 		subNum() {
 			if(this.addCartNum > this.limitNum) {
@@ -527,52 +531,53 @@ export default {
 		this.csrftoken = document.cookie.match(/csrftoken=\w+/g)[0].replace(/csrftoken=/, '')
 		let vm = this
 		Loading('show')
-		fetch('/purchase/api/m/skuonline/detail/' + this.skuId, {
+		reqwest({
+			url: '/purchase/api/m/skuonline/detail/' + vm.skuId,
 			method: 'GET',
-			credentials: 'include',
+			contentType: "application/json;charset=utf-8;",
 			headers: {
 				'X-CSRFTOKEN': this.csrftoken,
 			}
-		}).then(function(res){
-			if(res.ok) {
-				res.json().then(function(resp) {
-					console.log('resp', resp)
-					Loading('hide')
-					vm.skuName = resp.sku.name || '--'
-					vm.priceInt = resp.online_area.price.split('.')[0] || '--'
-					vm.priceDeci = resp.online_area.price.split('.')[1] || '--'
-					vm.specs = resp.sku.specs || '--'
-					vm.dosageForm = resp.sku.dosage_form || '--'
-					vm.unit = resp.unit || '--'
-					vm.rate = parseFloat(resp.rate) * 100 || 0
-					vm.limit = resp.limit === 1 ? '中包' : (resp.limit === 2 ? '整件' : '拆零')
-					if(resp.sku.pics.length > 0) {
+		}).then(resp => {
+			console.log('resp', resp)
+			Loading('hide')
+			vm.skuName = resp.sku.name || '--'
+			vm.priceInt = resp.online_area.price.split('.')[0] || '--'
+			vm.priceDeci = resp.online_area.price.split('.')[1] || '--'
+			vm.specs = resp.sku.specs || '--'
+			vm.dosageForm = resp.sku.dosage_form || '--'
+			vm.unit = resp.unit || '--'
+			vm.rate = parseFloat(resp.rate) * 100 || 0
+			vm.limit = resp.limit === 1 ? '中包' : (resp.limit === 2 ? '整件' : '拆零')
+			if(resp.sku.pics.length > 0) {
 
-						for(let i=0; i<resp.sku.pics.length; i++) {
-							resp.sku.pics[i].ad_pic = '//static.eyaos.com/images/no_product.png'
-						}
-						vm.imgs = resp.sku.pics
-					} else {
-						vm.imgs = [{ad_pic: '//static.eyaos.com/images/no_product.png'}]
-					}
-					vm.stock = resp.sku_stock ? resp.sku_stock.stock : 0
-					if(vm.stock === 0 || resp.sku_stock.sku_status === false) {
-						vm.btnStatus = true
-					} else {
-						vm.btnStatus = false
-					}
-					vm.adMsg =  resp.sku.ad_msg || '--'
-					vm.midBag = resp.middle || '--'
-					vm.largeBag = resp.package || '--'
-					vm.isMedCare = resp.sku_pro ? (resp.sku_pro.yibao ? '是' : '否') : '否'
-					vm.license = resp.license || '--'
-					vm.factory = resp.sku.factory || '--'
-					vm.company = resp.online_area ? (resp.online_area.company.name || '--') : '--'
-					vm.limitNum = resp.limit_num || '--'
-					vm.addCartNum = resp.limit_num || '--'
-				})
+				for(let i=0; i<resp.sku.pics.length; i++) {
+					let item = resp.sku.pics[i].ad_pic
+					resp.sku.pics[i].ad_pic = item ? item : '//static.eyaos.com/images/no_product.png'
+				}
+				vm.imgs = resp.sku.pics
+			} else {
+				vm.imgs = [{ad_pic: '//static.eyaos.com/images/no_product.png'}]
 			}
-		}).catch((err) => {
+			vm.stock = resp.sku_stock ? resp.sku_stock.stock : 0
+			vm.adMsg =  resp.sku.ad_msg || '--'
+			vm.midBag = resp.middle || '--'
+			vm.largeBag = resp.package || '--'
+			vm.isMedCare = resp.sku_pro ? (resp.sku_pro.yibao ? '是' : '否') : '否'
+			vm.license = resp.license || '--'
+			vm.factory = resp.sku.factory || '--'
+			vm.company = resp.online_area ? (resp.online_area.company.name || '--') : '--'
+			vm.limitNum = resp.limit_num || '--'
+			vm.addCartNum = resp.limit_num || '--'
+			if(vm.stock < vm.addCartNum || resp.sku_stock.sku_status === false) {
+				vm.cartStatus = 0 //下架/库存不足
+				vm.btnStatus = true
+			} else {
+				vm.cartStatus = 1 //加入购物车
+				vm.btnStatus = false
+			}
+
+		}).fail((err) => {
 			Loading('hide')
 			console.log('err', err)
 		})

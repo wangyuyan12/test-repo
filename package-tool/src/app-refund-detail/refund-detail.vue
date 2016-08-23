@@ -145,24 +145,18 @@ export default {
 	methods: {
 
 		modifyRefundStatus(param, vm) {
-			fetch('/purchase/api/proxy/refundorder/' + vm.orderId, {
+			reqwest('/purchase/api/proxy/refundorder/' + vm.orderId, {
 				method: 'PATCH',
-				credentials: 'include',
+				contentType: "application/json;",
 				headers: {
 					'Authorization': vm.token,
-					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify(param)
-			}).then((res) => {
+			}).then(resp => {
 				Loading('hide')
-				res.json().then((resp) => {
-					vm.refundStatus = vm.stateList[resp.refund_state]
-					vm.footType = 0
-				}).catch(err => {
-					Jalert('请重试！', 'icon-error')
-				})
-				
-			}).catch((err) => {
+				vm.refundStatus = vm.stateList[resp.refund_state]
+				vm.footType = 0
+			}).fail((err) => {
 				Loading('hide')
 				console.log('err', err)
 				Jalert('请重试！', 'icon-error')

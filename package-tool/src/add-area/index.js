@@ -4,7 +4,8 @@ import $ from 'jquery'
 
 $(() => {
 	let csrftoken = document.cookie.match(/csrftoken=\w+/g)[0].replace(/csrftoken=/, '')
-	let skuId = /add\/\d+/.exec(location.href)[0].replace('add\/', '')
+	let onlineId = /add\/\d+/.exec(location.href)[0].replace('add\/', '')
+	let skuId = null
 	let rendSku = (sku) => {
 		return '<img src=' + sku.pic + '>'
 				+ '<div class="prod-intro">'
@@ -108,6 +109,7 @@ $(() => {
 				$('#sku-info').html(rendSku(sku))
 				$('#public-info').html(rendPubInfo(pub))
 				$('#area-table').html(rendArea(areas))
+				skuId = sku.id
 			},
 			error: () => {
 				console.log('failed to get data')
@@ -138,7 +140,8 @@ $(() => {
 			if(status === 'success') {
 				$(parenNode).find('.company').html(rendList(data))
 				if(data.length === 0) {
-					sweetAlert("温馨提示！", '抱歉，该区域未设置商业公司', 'error')
+					console.log('该区域未设置商业公司')
+					// sweetAlert("温馨提示！", '抱歉，该区域未设置商业公司', 'error')
 				}
 			}
 		})
@@ -167,9 +170,9 @@ $(() => {
 		}
 	}
 
-	let subApply = (applyInfos, skuId) => {
+	let subApply = (applyInfos, onlineId) => {
 		$.ajax({
-            url: '/purchase/api/skuonlinearea/' + skuId,
+            url: '/purchase/api/skuonlinearea/' + onlineId,
             type: 'POST',
             contentType: 'application/json',
             beforeSend: function(xhr) {
@@ -177,7 +180,8 @@ $(() => {
             },
             data: JSON.stringify(applyInfos),
             success: function(data) {
-            	sweetAlert("温馨提示！", '申请发送成功！', 'success')
+            	// sweetAlert("温馨提示！", '申请发送成功！', 'success')
+            	 location.reload()
             },
             error: function(xhr, textStatus, errorThrow) {
             	if(xhr.status === 400) {
@@ -190,7 +194,7 @@ $(() => {
         })
 	}
 
-	loadOnlineArea(skuId)
+	loadOnlineArea(onlineId)
 	getAreas($('.area-unit')[0], 1) //渲染省份	
 
 	$('.price').on('input', function() {

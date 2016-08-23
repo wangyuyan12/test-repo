@@ -25,6 +25,7 @@ graceful({
 		if(err.message) {
 			err.message += ' (uncaughtException throw ' + throwErrorCount +
 				' times on pid:' + process.pid + ')'
+			logger.info('[worker:%s]', process.pid, err.message)
 		}
 	}
 })

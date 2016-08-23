@@ -61,8 +61,9 @@
 </template>
 
 <script>
-import prodItem from './prod-item.vue'
 import reqwest from 'reqwest'
+import prodItem from './prod-item.vue'
+
 
 export default {
 	name: 'orderDetail',

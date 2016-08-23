@@ -1,0 +1,131 @@
+body {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        background-color: #333;
+      }
+      .face {
+        margin: 16px;
+        padding: 4px;
+        background-color: #e7e7e7;
+        width: 104px;
+        height: 104px;
+        border-radius: 5%;
+      }
+      .pip {
+        display: block;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        margin: 4px;
+        background-color: #333;
+      }
+      .first {
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-end;
+      }
+      .second {
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .second .pip-two {
+        align-self: center;
+      }
+      .third {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      .third .pip-two {
+        align-self: center;
+      }
+      .third .pip-three {
+        align-self: flex-end;
+      }
+      .forth {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        flex-direction: column;
+      }
+      .forth .column {
+        display: flex;
+        justify-content: space-between;
+      }
+      .sixth {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .sixth .column {
+        display: flex;
+        justify-content: space-between;
+      }
+      .sixth .column:nth-child(2){
+        align-self: center;
+      }
+
+      .grid {
+        display: flex;
+        flex-flow: row wrap;
+        background-color: #e7e7e7;
+        flex-basis: 100%;
+      }
+
+      .grid .grid-cell {
+        flex: 1;
+      }
+
+      .grid .u-1of2 {
+        flex: 1 1 350px;
+        border: 2px solid green;
+      }
+      .input-style {
+        display: flex;
+        flex-flow: row wrap;
+        flex: 1 1 100%;
+        background-color: #fff;
+      }
+      .input-style .input-addon {
+        display: flex;
+        margin: 10px;
+        border: 1px solid black;
+        height: 40px;
+        flex: 1;
+        font-size: 14px;
+        align-items: center;
+      }
+      .input-style .input-addon .input-addon-item {
+        flex-basis: 18%;
+        line-height: 2.5;
+        height: 100%;
+        background-color: #696969; 
+      }
+      .input-style .input-addon .input-addon-field {
+        flex-grow: 1;
+        line-height: 2.5;
+        border: none;
+      }
+      .input-addon2 {
+        display: flex;
+        flex-flow: row wrap;
+        padding: 10px;
+        align-items: center; 
+        span {
+          flex: 0 1 18%;
+        }
+        input {
+          flex: 1 1 75%;
+        }
+        .ok {
+          flex-flow: row wrap;
+          flex: 1 1 100%;
+          word-break: break-all;
+        }
+      }

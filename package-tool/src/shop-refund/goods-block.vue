@@ -80,7 +80,7 @@
 						border-radius: 5px;
 					}
 
-					span {
+					/* span {
 						display: inline-block;
 						width: 6rem;
 						font-size: 1.4rem;
@@ -88,6 +88,13 @@
 						color: #323232;
 						border-left: 1px solid #d9d9d9;
 						border-right: 1px solid #d9d9d9;
+					} */
+					.return-num {
+						border-left: 1px solid #d9d9d9;
+					    border-right: 1px solid #d9d9d9;
+					    border-radius: 0;
+					    text-align: center;
+					    min-width: 50px;
 					}
 				}
 			}
@@ -201,7 +208,7 @@
 				<span v-else class="detail">数量：
 					<span class="num-cunt">
 						<input type="button" @click="subNum" value="-"> 
-						<span>{{ returnNum }}</span>
+						<input class="return-num" @input="numChange" type="text" :value="returnNum" v-el:returnnum>
 						<input type="button" @click="addNum" value="+">
 					</span>
 				</span>
@@ -213,7 +220,7 @@
 					<img src="./resource/phone.png" alt="">
 					厂家：&nbsp;{{ prodInfo.sku.factory }}
 				</span>
-				<span class="sum">￥{{ sum }}</span>
+				<span class="sum">￥{{ sum | formatPrice }}</span>
 			</div>
 		</div>
 		<div class="num-date" style="display: none">
@@ -262,7 +269,7 @@ export default {
 				this.returnNum = this.returnNum + 1
 				this.$dispatch('refundProd', {id: this.prodInfo.sku.id, num: this.returnNum})
 			} else {
-				alert('退货数量不能超过采购数量')
+				Jalert('退货数量不能超过订货数量')
 			}
 		},
 		subNum() {
@@ -270,11 +277,35 @@ export default {
 				this.returnNum = this.returnNum - 1
 				this.$dispatch('refundProd', {id: this.prodInfo.sku.id, num: this.returnNum})
 			}	
-		}
+		},
+		numChange() {
+			
+			if(!this.$els.returnnum.value || /^[1-9][0-9]*$/.test(this.$els.returnnum.value)) {
+				this.returnNum = Number(this.$els.returnnum.value)
+
+				if(this.returnNum <= this.prodInfo.num) {
+					this.$dispatch('refundProd', {id: this.prodInfo.sku.id, num: this.returnNum})
+				} else {
+					this.returnNum = 0
+					this.$els.returnnum.value = 0
+					this.$dispatch('refundProd', {id: this.prodInfo.sku.id, num: 0})
+					Jalert('退货数量不能超过订货数量')
+				}
+			} else {
+				this.$els.returnnum.value = 0
+				Jalert('请输入整数')
+			}
+			
+		},
 	},
 	beforeCompile() {
 		this.sum = parseFloat( this.prodInfo.price ) * parseFloat( this.prodInfo.num )
 		this.pic = this.prodInfo.sku.pic ? this.prodInfo.sku.pic : '//static.eyaos.com/images/no_product.png'
+	},
+	filters: {
+		formatPrice (price) {
+			return Number(price).toFixed(2)
+		},
 	}
 
 }

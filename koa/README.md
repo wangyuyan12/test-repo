@@ -59,7 +59,7 @@
 
 ## 工程目录结构
 ```
-├── eyaos_front        #开发目录  
+├──koa2-web        #开发目录  
 |   ├──bin    #服务启动相关路径  
 |   |   ├──app.js   #koa 服务入口  
 |   |   ├──dispatch.js  #graceful 异常捕捉

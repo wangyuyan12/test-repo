@@ -89,6 +89,7 @@
 				color: #2fb1fd;
 				float: left;
 				bottom: .8rem;
+				width: 80%;
 				img {
 					height: 1.4rem;
 					vertical-align: -10%;
@@ -143,7 +144,7 @@
 			<div class="prod-info">
 				<span class="detail no-wrap">剂型：&nbsp;{{ orderInfo.sku.dosage_form }}</span>
 				<span class="detail no-wrap">规格：&nbsp;{{ orderInfo.sku.specs }}</span> <br>
-				<span class="detail no-wrap">单价：&nbsp;￥{{ orderInfo.price }}</span>
+				<span class="detail no-wrap">单价：&nbsp;￥{{ orderInfo.price | formatPrice }}</span>
 				<span class="detail no-wrap">数量：&nbsp;{{ orderInfo.num }}</span> <br>
 				<span class="sum">总计</span> <br>
 
@@ -151,12 +152,12 @@
 					<img src="./resource/phone.png" alt="">
 					厂家：&nbsp;{{ orderInfo.sku.factory }}
 				</span>
-				<span class="sum">￥{{ sum }}</span>
+				<span class="sum">￥{{ sum | formatPrice }}</span>
 			</div>
 		</div>
 		<div class="batch-date" v-if="showBatchDate">
 			<span>生产批号：&nbsp;{{ orderInfo.batch }}</span>
-			<span class="shelf-life">产品有效期：&nbsp;{{ orderInfo.expiry_time }}</span>
+			<span class="shelf-life">产品有效期：&nbsp;{{ orderInfo.expiry_time | formatExpiry }}</span>
 		</div>
 
 		<!-- 样式在 roder-detial 中编写 -->
@@ -207,6 +208,14 @@ export default {
 		this.verifyTag = this.orderInfo.sku_auth ? ( this.orderInfo.sku_auth.auth_state === 1 ? 'block' : 'none' ) : 'block'
 		this.prodStatus = this.orderInfo.state === 1 ? '' : (this.orderInfo.state === 2 ? '已取消' : '取消中')
 		this.showBatchDate = this.orderStatus > 3 ? true : false  
+	},
+	filters: {
+		formatExpiry (expiryTime) {
+			return expiryTime ? expiryTime.split('T')[0] : '未设置有效期'
+		},
+		formatPrice (price) {
+			return Number(price).toFixed(2)
+		},
 	}
 
 }

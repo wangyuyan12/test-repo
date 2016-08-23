@@ -10,14 +10,14 @@
           "type": "dateFile",
           "filename": "http.log",
           "pattern": "-yyyy-MM-dd",
-          "category": "http"
+          "category": "http" 
         },
         {
           "type": "file",
           "filename": "app.log",
           "maxLogSize": 10485760,
           "pattern": "-yyyy-MM-dd",
-          "numBackups": 5
+          "numBackups": 5 
         },
         {
           "type": "logLevelFilter",

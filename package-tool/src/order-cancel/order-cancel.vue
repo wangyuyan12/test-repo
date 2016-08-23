@@ -1,19 +1,19 @@
 <style lang="less">
-@import '../common/loading/loading.css';
 	.page-wrapper {
 		position: relative;
 		background-color: #fff;
 		margin-top: 1rem;
+		margin-bottom: 5rem;
 	}
 
 	.footbar {
 		position: fixed;
 		bottom: 0;
-		margin-top: 1px solid #d9d9d9;
 		width: 100%;
 		line-height: 4.5rem;
 		font-size: 1.4rem;
 		text-align: center;
+		background-color: #fff;
 		.select-all {
 			display: inline-block;
 			width: 25%;
@@ -36,6 +36,47 @@
 		vertical-align: middle;
 	}
 
+	.confirm-cover {
+		position: fixed;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		left: 0;
+		z-index: 1001;
+		background: rgba(0, 0, 0, 0.3);
+		display: none;
+		.confirm-win {
+			margin: 30% auto 0;
+			top: 30%;
+			width: 26rem;
+			height: 14rem;
+			background-color: #fff;
+			border-radius: 4px;
+			text-align: center;
+			font-size: 1.6rem;
+			color: #000;
+			span {
+				line-height: 9.5rem;
+			}
+			.confirm-operate {
+				line-height: 4.5rem;
+				border-top: 1px solid #d9d9d9;
+				input {
+					width: 49%;
+					color: #30b2fb;
+					border: 0;
+    				background: none;
+    				line-height: 4.3rem;
+    				font-size: 1.4rem;
+				}
+				input:first-of-type {
+					color: #000;
+					border-right: 1px solid #d9d9d9;
+				}
+			}			
+		}
+	}
+
 </style>
 
 <template>
@@ -53,14 +94,23 @@
 				</span> 
 				<span class="text">全选</span>
 			</span>
-			<span class="order-operate" :style="{backgroundColor: enabelCancel ? '#30b3fb' : '#d9d9d9'}" @click="cancelSkus">取消所选药品</span>
+			<span class="order-operate" :style="{backgroundColor: enabelCancel ? '#30b3fb' : '#d9d9d9'}" @click="orderOperate(2)">取消所选药品</span>
+		</div>
+	</div>
+	<div class="confirm-cover" :style="{display: showConfirm}">
+		<div class="confirm-win">
+			<span>确定取消订单？</span> <br>
+			<div class="confirm-operate">
+				<input type="button" class="concel"  @click="orderOperate(0)" value="取消">
+				<input type="button" class="call" @click="orderOperate(1)" value="确定">
+			</div>
 		</div>
 	</div>
 	
 </template>
 
 <script>
-import fetch from 'isomorphic-fetch'
+import reqwest from 'reqwest'
 import orderBlock from './order-block.vue'
 
 export default {
@@ -78,6 +128,7 @@ export default {
 			selectedItem: [],  //选中的订单
 			selectAbleLength: 0,
 			selectAll: false,
+			showConfirm: 'none'
 		}
 	},
 	methods: {
@@ -96,40 +147,52 @@ export default {
 				this.$broadcast('selectAllProd', 'cancel')
 			}
 		},
-		cancelSkus() {  //取消订单中产品
-			if(this.enabelCancel) {
-				let param = {
-					all: this.selectAll,
-					sku_list: this.selectedItem,
+
+		orderOperate(state) {
+			if(state === 0) {
+				this.showConfirm = 'none'
+				return
+			} else if(state === 1) {
+				this.showConfirm = 'none'
+				this.cancelSkus()
+			} else if(state === 2) {
+				if(this.enabelCancel) {
+					this.showConfirm = 'block'
 				}
-				let vm = this
-				Loading('show')
-				//取消订单接口
-				fetch('/purchase/api/shop/order/update/' + this.orderId, {
-					method: 'PATCH',
-					credentials: 'include',
-					headers: { 
-						'Content-Type': 'application/json',
-						'X-CSRFTOKEN': this.csrftoken,
-					},
-					body: JSON.stringify(param)
-				}).then((res) => {
-					res.json().then((resp) => {
-						Loading('hide')
-						console.log('resp', resp)
-						if(resp.status === 200) {
-							self.location = '/purchase/m/order/list/'
-						} else {
-							console.log('resp', resp.detail)
-							Jalert('请重试！', 'icon-error')
-						}
-					})
-				}).catch((err) => {
-					Loading('hide')
-					console.log('err', err)
-					alert('请重试！', 'icon-error')
-				})
 			}
+		},
+
+		cancelSkus() {  //取消订单中产品
+			
+			let param = {
+				all: this.selectAll,
+				sku_list: this.selectedItem,
+			}
+			let vm = this
+			Loading('show')
+			//取消订单接口
+			reqwest({
+				url: '/purchase/api/shop/order/update/' + this.orderId, 
+				method: 'PATCH',
+				contentType: "application/json;",
+				headers: {
+					'X-CSRFTOKEN': this.csrftoken,
+				},
+				data: JSON.stringify(param)
+			}).then(resp => {
+				Loading('hide')
+				console.log('resp', resp)
+				if(resp.status === 200) {
+					self.location = '/purchase/m/order/list/'
+				} else {
+					console.log('resp', resp.detail)
+					Jalert('请重试！', 'icon-error')
+				}
+			}).fail((err) => {
+				Loading('hide')
+				console.log('err', err)
+				alert('请重试！', 'icon-error')
+			})	
 		}
 	},
 	events: {
@@ -163,23 +226,25 @@ export default {
 		let vm = this
 		Loading('show')
 		//加载订单详情
-		fetch('/purchase/api/order/' + this.orderId, {
+		reqwest({
+			url: '/purchase/api/order/' + this.orderId, 
 			method: 'GET',
-			credentials: 'include',
+			contentType: "application/json;",
 			headers: {
 				'X-CSRFTOKEN': this.csrftoken,
 			}
-		}).then(function(res) {
-			res.json().then(function(resp) {
-				console.log('resp', resp)
-				vm.orders = resp.order_skus
-				for(let i=0; i<vm.orders.length; i++) {
-					if(vm.orders[i].state === 1) {
-						vm.selectAbleLength += 1
-					}
+		}).then(resp => {
+			console.log('resp', resp)
+			vm.orders = resp.order_skus
+			for(let i=0; i<vm.orders.length; i++) {
+				if(vm.orders[i].state === 1) {
+					vm.selectAbleLength += 1
 				}
-				Loading('hide')
-			})
+			}
+			Loading('hide')
+		}).fail(err => {
+			Loading('hide')
+			Jalert('请重试！', 'icon-error')
 		})
 	}
 

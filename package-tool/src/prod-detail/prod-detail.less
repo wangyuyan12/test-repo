@@ -18,7 +18,7 @@ body{
 	}
 	
 	.content {
-		width: 500px;
+		width: 700px;
 		.layer {
 			margin-top: 30px;
 			.layer-title {
@@ -30,6 +30,8 @@ body{
 				.to-edit {
 					float: right;
 					color: #83b8fe;
+					width: 30px;
+					cursor: pointer;
 				}
 			}
 			.base-info {
@@ -63,7 +65,8 @@ body{
 							display: inline-block;
 							width: 210px;
 						}
-					}
+						
+					} 
 				}
 				.public-info {
 					p {
@@ -73,6 +76,11 @@ body{
 						span {
 							display: inline-block;
 							width: 230px;
+						}
+						.online-info {
+							color: #999;
+	    					width: 150px;
+	    					background-color: #fff
 						}
 					}
 
@@ -88,6 +96,33 @@ body{
 								td {
 									text-align: center;
 									vertical-align: middle;
+									
+									.online-price {
+										width: 100%;
+										text-align: center;
+										background: none;
+									}
+									.sel-style {
+										background: none;
+										appearance:none;
+										-moz-appearance:none;
+										-webkit-appearance:none;
+									}
+									.online-btn {
+										color: #83b8fe;
+										width: 35px;
+										margin: 0 3px;
+										font-size: 14px;
+										background: none;
+										cursor: pointer;
+									}
+									.del {
+										color: #d52653
+									}
+									.reapply {
+										width: 70px;
+									}
+
 								}
 							}
 						}
