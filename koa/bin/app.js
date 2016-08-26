@@ -31,8 +31,8 @@ app.use(finalHandler())
 
 app.use(nunjucksViews(`${path.resolve(__dirname, '..')}/src/views`, {  //模板插件
 	ext: 'html',
-	noCache: process.env.NODE_ENV === 'development',
-	watch: process.env.NODE_ENV === 'development',
+	noCache: true, //process.env.NODE_ENV === 'development',
+	watch: true, //process.env.NODE_ENV === 'development',
 	filters: {
 	    json: function(str) {
 	      return JSON.stringify(str, null, 2);

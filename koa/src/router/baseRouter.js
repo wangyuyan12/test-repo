@@ -143,8 +143,8 @@ router.get('/flex', co.wrap(function* (ctx, next) {
 	yield ctx.render('flex/index')
 }))
 
-router.get('/test', co.wrap(function* (ctx, next) {
-	yield ctx.render('test/rppn')
+router.get('/scroll', co.wrap(function* (ctx, next) {
+	yield ctx.render('scroll/scroll')
 }))
 
 module.exports = router 
