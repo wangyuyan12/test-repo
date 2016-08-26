@@ -294,7 +294,7 @@
 				@touchend="touchEndP1"
 				@touchcancel="touchCancelP1">
 				<img src="/static/classic/purchase/resource/arrow.jpg">
-				<span>下拉显示更多</span>
+				<span>上拉显示更多</span>
 			</div>
 		</div>
 		<div id='page-two' class="page-two"

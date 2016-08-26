@@ -193,6 +193,7 @@
 					border: 0;
     				background: none;
     				line-height: 4.3rem;
+    				font-size: 1.4rem;
 				}
 				input:first-of-type {
 					color: #000;

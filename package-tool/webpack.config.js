@@ -40,7 +40,7 @@ var enteryFiles = function() {
 
       var filePath = /[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+\.js/.exec(item)[0].replace(/\.js/, '')  //filePath配置时把最后的 ‘/’去掉，否则在hot reload情况下，会出现文件无法找到情况
       console.log('filePath: ', filePath)
-      enteryObj[filePath] = [item, 'webpack-hot-middleware/client']
+      enteryObj[filePath] = [item]
     })
   }
   return enteryObj

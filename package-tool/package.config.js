@@ -3,8 +3,6 @@
 //打包路径配置
 var configDir = {
   enteryDir: [
-  				'./src/prod-detail/index.js',
-  			 	'./src/add-area/index.js',
   			 './src/sku-detail/index.js',
   			 './src/order-detail/index.js',
          './src/order-cancel/index.js',
