@@ -5,13 +5,13 @@
     height: 0;
     visibility: hidden;
     clear: both;
-    content: " ";
+    content: "";
 }
+
 .prod-detail {
 	position: relative;
 	padding: 13px 15px;
 	border-bottom: 1px solid #f5f5f5;
-	overflow: auto;
 	img {
 		display: inline-block;
 		float: left;
@@ -19,6 +19,7 @@
 	}
 	.info-detail {
 		width: 80%;
+		height: 100%;
 		float: left;
 		margin-left: 10px;
 		overflow: auto;
@@ -27,16 +28,8 @@
 			color: #323232;
 		}
 		.prod-name {
-			display: inline-block;
-			width: 65%;
-			height: 38px;
-		}
-		.price-num {
-			display: inline-block;
-			float: right;
-			width: 35%;
-			height: 38px;
-			text-align: right;
+			display: block;
+			width: 100%;
 		}
 		.specs {
 			font-size: 1.1rem;
@@ -52,8 +45,7 @@
 		<img :src="pic">
 		<div class="info-detail">
 			<span class="prod-name">{{ prodInfo.sku.name }}</span>
-			<span class="price-num">￥{{ prodInfo.price}}*{{ prodInfo.num }}</span>
-			<span class="specs">剂型:&nbsp;&nbsp;{{ prodInfo.sku.dosage_form }}</span>
+			<span class="specs">剂型:&nbsp;&nbsp;{{ prodInfo.sku.specs }}&nbsp;&nbsp;{{ prodInfo.price }}*{{ prodInfo.num }}</span>
 		</div>
 	</div>
 </template>

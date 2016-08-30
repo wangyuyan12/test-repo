@@ -10,6 +10,7 @@ var configDir = {
          './src/refund-detail/index.js',
          './src/app-order-detail/index.js',
          './src/app-refund-detail/index.js',
+         // './src/proxy-apply/index.js'
   			 ],
    outputDir: '/home/tzf/Documents/eyaos/eyaos_web/web/static/classic/purchase/'  //支持一个输出路径
 }

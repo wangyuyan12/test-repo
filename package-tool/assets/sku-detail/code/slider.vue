@@ -1,45 +1,46 @@
-<style lang='css'>
-.sliders-wrapper {
-	position: relative;
-	overflow: hidden;
-	width: 100%;
-}
-.sliders-wrapper .sliders {
-	width: 99999999px;
-	transition: all .5s;
-}
-.sliders-wrapper .sliders .slider {
-	float: left;
-}
+<style lang='less'>
+	.slider-wrapper{
+		position: relative;
+		overflow: hidden;
+		width: 100%;
+		.sliders {
+			width: 99999999px;
+			transition: all .5s;
+			.slider {
+				float: left
+			}
+		}
 
-.sliders-wrapper .slider-nav {
-	position: relative;
-	bottom: 25px;
-	margin: auto;
-	padding: 0;
-}
-.sliders-wrapper .slider-nav li {
-	float: left;
-	list-style: none;
-}
-.sliders-wrapper .slider-nav li .circle {
-	display: block;
-	margin-left: 7px;
-	width: 10px;
-	height: 10px;
-	border: 1px solid #ddd;
-	border-radius: 50%;
-	background: transparent;
-}
-.sliders-wrapper .slider-nav li .active {
-	background-color: #fb83ac;
-	border-color: #fb83ac;
-}
-.slider-wrapper ::after {
-	content: '';
-	display: block;
-	clear: both;
-}
+		.slider-nav {
+			position: relative;
+			bottom: 25px;
+			margin: auto;
+			padding: 0;
+			li {
+				float: left;
+				list-style: none;
+				.circle {
+					display: block;
+					margin-left: 7px;
+					width: 10px;
+					height: 10px;
+					border: 1px solid #ddd;
+					border-radius: 50%;
+					background: transparent;
+				}
+
+				.active {
+					background-color: #fb83ac;
+					border-color: #fb83ac;
+				}
+			}	
+		}
+	}
+	.slider-wrapper ::after {
+		content: '';
+		display: block;
+		clear: both;
+	}
 </style>
 
 <template>
@@ -65,7 +66,7 @@
 
 <script>
 	
-var Yslider = Vue.exten({
+export default {
 	name: 'slider',
 
 	props: {
@@ -73,7 +74,7 @@ var Yslider = Vue.exten({
 		imgArray: Array,
 	},
 
-	data: function() {
+	data: () => {
 		return {
 			current: 0,
 			sliderWidth: 0,
@@ -91,18 +92,18 @@ var Yslider = Vue.exten({
 		}
 	},
 	methods: {
-		changeImgStart: function(e) {
+		changeImgStart(e) {
 			e.preventDefault()
-			var touch = e.touches[0]
+			let touch = e.touches[0]
 			this.startX = touch.pageX
 			clearInterval(this.intervalFlag)
 		},
-		changeImgMove: function(e) {
+		changeImgMove(e) {
 			e.preventDefault()
-			var touch = e.touches[0]
+			let touch = e.touches[0]
 			this.offsetX = touch.pageX - this.startX
 		},
-		changeImgEnd: function(e) {
+		changeImgEnd(e) {
 			e.preventDefault()
 			if(this.offsetX === 0) {
 				this.imgs[this.current].click()
@@ -114,7 +115,7 @@ var Yslider = Vue.exten({
 			this.offsetX = 0
 			this.autoPlay()
 		},
-		changeImgs: function(index) {
+		changeImgs(index) {
 			if(index === 'next') {
 				this.current ++
 			} else if(index === 'pre') {
@@ -125,11 +126,11 @@ var Yslider = Vue.exten({
 			this.current = this.current < 0 ? this.imgsNum-1 : this.current % this.imgsNum
 			this.sliders.style.marginLeft = '-' + (this.current * this.sliderWidth) + 'px'
 		},
-		autoPlay: function() {
-			this.intervalFlag = setInterval(function() { this.changeImgs('next') }, this.interval)
+		autoPlay() {
+			this.intervalFlag = setInterval(() => { this.changeImgs('next') }, this.interval)
 		}
 	},
-	ready: function() {
+	ready() {
 		this.sliderWidth = this.$els.wrapper.parentNode.clientWidth
 		this.sliderHeight = this.$els.wrapper.parentNode.clientHeight
 		this.sliders = this.$els.sliders
@@ -147,6 +148,5 @@ var Yslider = Vue.exten({
 		this.sliders.style.width = (this.imgsNum * this.sliderWidth) + 'px' //slider总宽度
 		this.autoPlay()	//启动
 	},
-})
-Vue.component('yslider', Yslider)
+}
 </script>

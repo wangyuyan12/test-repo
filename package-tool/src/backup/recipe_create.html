@@ -1,0 +1,881 @@
+{% extends "layout/base_purchase_back.html" %} 
+{% block title %}新增处方{% endblock %} 
+{% block content %}
+<style>
+.entry-main {
+    width: 1100px;
+    background-color: #fff;
+    font-family: "Microsoft Yahei", tahoma, arial, "Hiragino Sans GB", "helvetica neue", helvetica, arial, Sans-serif, "Hiragino Sans GB", "Hiragino Sans GB W3", "SimHei";
+}
+
+.entry-main .entry-img {
+    margin: 0 45px;
+    border-bottom: 1px solid #999;
+    overflow-x: scroll;
+    overflow-y:hidden;
+    padding: 35px 0;
+    height: 165px;
+}
+
+.entry-main .entry-img ul {
+    padding-left: 0;
+    margin: 0;
+    height:100%;
+}
+
+.entry-main .entry-img ul li {
+    list-style-type: none;
+    float: left;
+    margin-right: 13px;
+    border: 0;
+}
+.entry-main .entry-img ul li.active{
+    border: 1px solid #00c4b4;
+}
+.entry-main .entry-img ul li.active .li-p1, .entry-main .entry-img ul li.active .li-p2{
+    display: none;
+}
+.entry-main .entry-img ul li:last-child {
+    margin-right: 0;
+}
+
+.entry-main .entry-img ul li .img-li {
+    height: 98px;
+    width: 98px;
+    position: relative;
+}
+
+.entry-main .entry-img ul li .img-li img {
+    height: 100%;
+    width: 100%;
+}
+
+.entry-main .entry-img ul li .img-li p {
+    position: absolute;
+    top: 0;
+    margin: 0;
+    text-align: center;
+    width: 100%;
+    background-color:#d0d0d0;
+    font-size: 13px;
+    color: #000;
+    height: 24px;
+    line-height: 24px;
+}
+
+.entry-main .entry-table {
+    margin: 30px 45px 0 45px;
+    float: left;
+    display: none;
+}
+
+.entry-main .entry-table .table-top {
+    font-size: 18px;
+    color: #00c4b4;
+}
+
+.entry-main .entry-table .table-name {
+    width: 560px;
+    padding-left: 70px;
+    margin-top:32px;
+}
+
+.entry-main .entry-table .table-name p {
+    font-size: 16px;
+}
+.entry-main .entry-table .table-name p span{
+    padding-right: 10px;
+}
+.entry-main .entry-table .table-name p select {
+    height: 35px;
+    line-height: 35px;
+    width: 225px;
+    margin: 5px;
+    border: 1px solid #e6e6e6;
+    margin: 5px 0;
+}
+
+.entry-main .entry-table .table-done .table-done-list{
+    border: 1px solid #c9c9c9;
+    background-color: #eee;
+    width: 560px;
+    height: 205px;
+    position: relative;
+    margin: 10px 0;
+}
+.entry-main .num-padding{
+    padding-left:32px;
+}
+
+.entry-main .entry-table .table-done ul {
+    padding-left: 0;
+}
+
+.entry-main .entry-table .table-done ul li {
+    list-style-type: none;
+    margin: 20px 0 20px 40px;
+    font-size: 16px;
+}
+
+.entry-main .entry-table .table-done ul li span {
+    padding-right: 10px;
+}
+
+.entry-main .entry-table .table-done ul li select {
+    height: 30px;
+    line-height: 30px;
+    width: 320px;
+    border: 1px solid #e6e6e6;
+}
+
+.entry-main .entry-table .table-done ul li input {
+    width: 180px;
+    height: 30px;
+    line-height: 30px;
+    border: 1px solid #e6e6e6;
+}
+
+.entry-main .entry-table .table-done .button {
+    position: absolute;
+    right: 30px;
+    bottom: 20px;
+}
+
+.entry-main .entry-table .table-done .button button {
+    height: 30px;
+    line-height: 30px;
+    width: 75px;
+    text-align: center;
+    color: #fff;
+    font-size: 16px;
+    border: 0;
+    border-radius: 5px;
+}
+
+.entry-main .entry-table .table-done .button .done-edit {
+    background-color: #228cfd;
+}
+
+.entry-main .entry-table .table-done .button .done-delete {
+    background-color: #ff5151;
+}
+
+.entry-main .entry-table .table-ing {
+    border: 1px solid #c9c9c9;
+    width: 560px;
+    height: 240px;
+    margin-top: 30px;
+    position: relative;
+}
+
+.entry-main .entry-table .table-ing ul {
+    padding-left: 0;
+}
+
+.entry-main .entry-table .table-ing ul li {
+    list-style-type: none;
+    margin: 15px 0 15px 40px;
+}
+
+.entry-main .entry-table .table-ing ul li span {
+    padding-right: 10px;
+}
+
+.entry-main .entry-table .table-ing ul li select {
+    height: 35px;
+    line-height: 35px;
+    width: 320px;
+    border: 1px solid #e6e6e6;
+}
+
+.entry-main .entry-table .table-ing ul li input {
+    height: 30px;
+    line-height: 30px;
+    border: 1px solid #e6e6e6;
+}
+
+.entry-main .entry-table .table-ing button {
+    width: 80px;
+    text-align: center;
+    height: 30px;
+    line-height: 30px;
+    background-color: #228cfd;
+    border: 0;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #fff;
+    position: absolute;
+    right: 30px;
+}
+
+.entry-main .entry-table .input-button {
+    width: 560px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.entry-main .entry-table .input-button input {
+    height: 40px;
+    line-height: 40px;
+    width: 180px;
+    text-align: center;
+    color: #fff;
+    font-size: 16px;
+    border: 0;
+    border-radius: 5px;
+}
+
+.entry-main .entry-table .input-button .in-submit {
+    background-color: #228cfd;
+}
+
+.entry-main .entry-table .input-button .in-reset {
+    background-color: #ff5151;
+}
+
+.entry-main .entry-position {
+    height: 550px;
+    width: 370px;
+    float: left;
+    margin-top: 100px;
+    position: relative;
+    display: none;
+}
+
+.entry-main .entry-picture {
+    height: 550px;
+    width: 370px;
+    border: 1px solid #999;
+    overflow: scroll;
+}
+
+.entry-main .entry-picture .pic {
+    overflow: hidden;
+    position: relative;
+    height: 550px;
+    width: 370px;
+    background-size: 100% 100%;
+}
+
+.entry-main .entry-picture .pic img {
+    height: 550px;
+    width: 370px;
+    transition: all 0.5s ease-in-out;
+}
+
+.entry-main .entry-picture .deg0-scale0 {
+    transform: rotate(0deg) scale(1);
+}
+
+/*.entry-main .entry-picture .deg0-scale1 {
+    transform: rotate(0deg) scale(1.2, 1.2);
+    transform-origin: 0 0;
+}
+
+.entry-main .entry-picture .deg0-scale2 {
+    transform: rotate(0deg) scale(1.4, 1.4);
+    transform-origin: 0 0;
+    overflow: auto;
+}
+
+.entry-main .entry-picture .deg0-scale3 {
+    transform: rotate(0deg) scale(1.6, 1.6);
+    transform-origin: 0 0;
+}*/
+
+/*.entry-main .entry-picture .pic .deg1-scale0 {
+    transform: rotate(90deg) scale(1);
+}
+*/
+/*.entry-main .entry-picture .deg1-scale1 {
+    transform: rotate(90deg) scale(1.2, 1.2);
+    transform-origin: 0 0;
+}
+
+.entry-main .entry-picture .deg1-scale2 {
+    transform: rotate(90deg) scale(1.4, 1.4);
+    transform-origin: 0 0;
+}
+
+.entry-main .entry-picture .deg1-scale3 {
+    transform: rotate(90deg) scale(1.6, 1.6);
+    transform-origin: 0 0;
+}
+
+.entry-main .entry-picture .over {
+}*/
+.entry-main .entry-picture .deg1-scale0 {
+    transform: rotate(90deg) scale(1);
+}
+.entry-main .entry-picture .deg2-scale0 {
+    transform: rotate(180deg) scale(1);
+}
+
+/*.entry-main .entry-picture .deg2-scale1 {
+    transform: rotate(180deg) scale(1.2, 1.2);
+    transform-origin: 0 0;
+}
+
+.entry-main .entry-picture .deg2-scale2 {
+    transform: rotate(180deg) scale(1.4, 1.4);
+    transform-origin: 0 0;
+}
+
+.entry-main .entry-picture .deg2-scale3 {
+    transform: rotate(180deg) scale(1.6, 1.6);
+    transform-origin: 0 0;
+}*/
+
+.entry-main .entry-picture .deg3-scale0 {
+    transform: rotate(270deg) scale(1);
+}
+
+/*.entry-main .entry-picture .deg3-scale1 {
+    transform: rotate(270deg) scale(1.2, 1.2);
+    transform-origin: 0 0;
+}
+
+.entry-main .entry-picture .deg3-scale2 {
+    transform: rotate(270deg)scale(1.4, 1.4);
+    transform-origin: 0 0;
+}
+
+.entry-main .entry-picture .deg3-scale3 {
+    transform: rotate(270deg) scale(1.6, 1.6);
+    transform-origin: 0 0;
+}*/
+
+.entry-main .entry-position em {
+    height: 30px;
+    width: 30px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: url(/static/classic/purchase/resource/recpicture.png) rgba(255, 255, 255, 0.6);
+}
+
+.entry-main .entry-position i {
+    height: 30px;
+    width: 30px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: url(/static/classic/purchase/resource/recpicture.png) rgba(255, 255, 255, 0.6);
+    background-size: 300% 100%;
+    background-position: 103% 0;
+}
+
+.entry-main .entry-position strong {
+    height: 30px;
+    width: 30px;
+    position: absolute;
+    bottom: 0;
+    right: 30px;
+    background: url(/static/classic/purchase/resource/recpicture.png) rgba(255, 255, 255, 0.6);
+    background-size: 300% 100%;
+    background-position: 51% 0;
+}
+.entry-main .entry-position a{
+    position: absolute;
+    bottom:13px;
+    right: 16px;
+}
+</style>
+<div class="entry-main">
+    <div class="entry-img">
+        <ul id="recipe-img-list">
+        </ul>
+    </div>
+    <!--entry-img-->
+    <div class="entry-table">
+        <p class="table-top">处方录入</p>
+        <div class="table-name">
+            <p id="recipe-table-name">
+                <span>医院</span>
+            </p>
+            <p id="recipe-table-p">
+                <span>医生</span>
+            </p>
+        </div>
+        <!--entry-name-->
+        <div class="table-done">
+            <div class="table-done-list">
+                <ul>
+                    <li>
+                        <span>药品名称</span>
+                        <span class="done-name">曹华清薏辛除湿止痛胶囊</span>
+                    </li>
+                    <li>
+                        <span>生产厂家</span>
+                        <span class="done-pro">西安阿房宫药业有限公司</span>
+                    </li>
+                    <li>
+                        <span class="num-padding">数量</span>
+                        <span class="done-num">2盒</span>
+                    </li>
+                </ul>
+                <div class="button">
+                    <button class="done-edit" id="done-edit">编辑</button>
+                    <button class="done-delete">删除</button>
+                </div>
+            </div>    
+        </div>
+        <!--table-done-->
+        <div class="table-ing">
+            <ul>
+                <li id="table-ing-name">
+                    <span>药品名称</span>
+                </li>
+                <li id="table-ing-pro">
+                    <span>生产厂家</span>
+                </li>
+                <li>
+                    <span class="num-padding">数量</span>
+                    <input type="text" value="20">
+                </li>
+            </ul>
+            <button>添加药品</button>
+        </div>
+        <div class="input-button">
+            <input class="in-submit" type="submit" value="保存并新建处方">
+        </div>
+    </div>
+    <!--entry-table-->
+    <div class="entry-position">
+        <em id="em" style="z-index: 10"></em>
+        <!-- <i id="i" style="z-index: 10"></i>
+        <strong id="strong" style="z-index: 10"></strong> -->
+        <a href="#" download="chufang">下载图片</a>
+        <div id="W_imgframe" class="entry-picture">
+            <div class="pic">
+                <img >
+            </div>
+        </div>
+    </div>
+</div>
+<!--entry-main-->
+<script type="text/javascript">
+var recipeId;
+var shopBaseData;
+var static_url = '{{ MEDIA_URL }}'
+var pos = location.href.lastIndexOf("/");
+var recipeId = location.href.substring(pos + 1, location.href.length);
+
+var dataList;
+var picId = null;
+var recipeData ={};
+var renderDoctors = function(docList) {
+    var docListStr = ''
+    for (var i = 0; i < docList.length; i++) {
+        docListStr += '<option value="' + docList[i].id + '">' + docList[i].name + '</option>'
+    }
+    $('#doctor-list').html(docListStr)
+}
+var clearInputArea = function() {
+    var tpl = [
+        '<p class="table-top">处方录入</p>',
+        '<div class="table-name">',
+        '<p id="recipe-table-name">',
+        '<span>医院</span>',
+        '</p>',
+        '<p id="recipe-table-p">',
+        '<span>医生</span>',
+        '</p>',
+        '</div><!--entry-name-->',
+        '<div class="table-done" id="table-done">',
+        '</div><!--table-done-->',
+        '<div class="table-ing">',
+         '<ul>',
+                '<li id="table-ing-name">',
+                    '<span>药品名称</span>',
+                '</li>',
+                '<li id="table-ing-pro">',
+                    '<span>生产厂家</span>',
+                    '<select id="factory-list" style="height: 35px;line-height: 35px;width: 225px;margin:5px;border:1px solid #e6e6e6"><option>选择厂家</option></select>',
+                '</li>',
+                '<li>',
+                    '<span class="num-padding">数量</span>',
+                    '<input id="input-text" type="text" value="">',
+                '</li>',
+            '</ul>',
+            '<button id="table-ingbut">添加药品</button>',
+        '</div>',
+        '<div class="input-button">',
+            '<input class="in-submit" type="submit" value="保存并新建处方">',
+        '</div>'
+    ];
+    $('.entry-table').html(tpl.join(""))
+}
+var bindHpSel = function() {
+    $('#hosp-sel').change(function() {
+        var valueId = $("#recipe-table-name  option:selected").val();
+        recipeData.hospital = parseInt(valueId);
+        var docList = []
+        for (var i = 0; i < shopBaseData.hospital_data.length; i++) {
+            var item = shopBaseData.hospital_data[i]
+            if (item.id.toString() == valueId) {
+                docList = item.doctor
+                break
+            }
+        }
+        if(docList.length!=0){
+            recipeData.doctor = parseInt(docList[0].id);
+            renderDoctors(docList);
+        }
+        
+    })
+    $('#doctor-list').change(function() {
+        var valueId = $("#doctor-list").val();
+        recipeData.doctor = valueId;
+    })
+}
+var bindSkuSel = function(){
+    $('#sku-sel').change(function() {
+        var proId = $(this).val();
+        var hHtml = '<span>生产厂家</span><select id="factory-list" style="height: 35px;line-height: 35px;width: 225px;margin:5px;border:1px solid #e6e6e6">';
+        for (var i = 0; i < shopBaseData.sku_data.length; i++) {
+                var item = shopBaseData.sku_data[i]
+                if (item.id.toString() == proId) {
+                   hHtml += '<option value="' + shopBaseData.sku_data[i].id + '">' + shopBaseData.sku_data[i].factory + '</option>'
+                }
+            }
+        hHtml += "</select>"    
+        $(this).parent().siblings("#table-ing-pro").html(hHtml);
+    });
+}
+// 输入区面板  显示已经有录入的处方信息
+var selectRecipe = function(rData) {
+    clearInputArea(); // 刷新处方录入区域
+    // 根据获取数据显示处方信息
+
+    // 1. 显示医院
+    var hHtml = '<select id="hosp-sel" style="height: 35px;line-height: 35px;width: 225px;margin:5px;border:1px solid #e6e6e6">';
+    var docList;
+       hHtml +='<option value="">选择医院</option>'
+    for (var i = 0; i < shopBaseData.hospital_data.length; i++) {
+        if (shopBaseData.hospital_data[i].id == rData.hospital) {
+            docList = shopBaseData.hospital_data[i].doctor;
+             hHtml += '<option value="' + shopBaseData.hospital_data[i].id + '" selected="selected" >' + shopBaseData.hospital_data[i].name.name + '</option>'
+        } else {
+            hHtml += '<option value="' + shopBaseData.hospital_data[i].id + '">' + shopBaseData.hospital_data[i].name.name + '</option>'
+        }
+    }
+    hHtml += "</select>"
+    $("#recipe-table-name").append(hHtml);
+
+    // 2.显示医生
+    var hHtml = '<select id="doctor-list" style="height: 35px;line-height: 35px;width: 225px;margin:5px;border:1px solid #e6e6e6">';
+    if(docList!=undefined){
+        for (var i = 0; i < docList.length; i++) {
+            if (docList[i].id == rData.doctor) {
+                 hHtml += '<option value="' + docList[i].id + '" selected="selected" >' + docList[i].name + '</option>'
+            } else {
+                hHtml += '<option value="' + docList[i].id + '">' + docList[i].name + '</option>'
+            }
+        }
+    }
+    hHtml += "</select>"
+    $("#recipe-table-p").append(hHtml);
+
+    bindHpSel(); //绑定医院选择事件
+    
+    // 渲染已经录入
+    if(rData.sku_dict!=undefined){
+        for (var j = 0; j < rData.sku_dict.length; j++) {
+            for(var i=0;i<shopBaseData.sku_data.length;i++){
+                 if(rData.sku_dict[j].id == shopBaseData.sku_data[i].id){
+
+                    var donehtml = '<div class="table-done-list">'
+                                  +'<ul>'
+                                    +'<li>'
+                                        +'<span>药品名称</span>'
+                                        +'<span class="done-name">'+shopBaseData.sku_data[i].name+'</span>'
+                                    +'</li>'
+                                    +'<li>'
+                                        +'<span>生产厂家</span>'
+                                        +'<span class="done-pro">'+shopBaseData.sku_data[i].factory+'</span>'
+                                   +'</li>'
+                                    +'<li>'
+                                        +'<span class="num-padding">数量</span>'
+                                        +'<span class="done-num">'+rData.sku_dict[j].num+'盒</span>'
+                                    +'</li>'
+                                +'</ul>'
+                                +'<div class="button" data-skuid="'+shopBaseData.sku_data[i].id+'">'
+                                    +'<button class="done-edit">编辑</button>'
+                                    +'<button class="done-delete">删除</button>'
+                                +'</div>'
+                    donehtml += '</div>'
+                    $('#table-done').append(donehtml)
+                }
+            }             
+        }                 
+    }
+      
+    // 4.渲染输入区域
+    var hHtml = '<select id="sku-sel" style="height: 35px;line-height: 35px;width: 225px;margin:5px;border:1px solid #e6e6e6">';
+    hHtml += '<option value="">选择药品</option>';
+    for (var i = 0; i < shopBaseData.sku_data.length; i++) {
+        hHtml += '<option value="' + shopBaseData.sku_data[i].id + '">' + shopBaseData.sku_data[i].name + '</option>'
+    }
+    hHtml += "</select>"
+    $("#table-ing-name").append(hHtml);
+    bindSkuSel();
+    
+}
+function renderHeadImgs(){
+    var width = 10;
+    $("#recipe-img-list").empty();
+    for (var i = 0; i < dataList.length; i++) {
+        var stateTpl = dataList[i].is_input ? '<p class="li-p1" id="li-p1">已录入</p>' : '<p class="li-p2">未录入</p>';
+        var activeTpl = dataList[i].id==picId?'class="active"':'';
+        var isinputFlag = dataList[i].is_input ? "1":"0";
+        var tpl = [
+            '<li '+activeTpl+' data-isinput="'+isinputFlag+'" data-id="' + dataList[i].id + '"><div class="img-li">',
+            '<img src="'+ static_url + dataList[i].pic_sm + '">',
+            stateTpl,
+            '</div></li>'
+        ];
+        width = width + 111;
+        $('.entry-main .entry-img ul').width(width);
+        $("#recipe-img-list").append(tpl.join(""));
+    }
+}
+$(document).ready(function() {
+    $.getJSON('/purchase/api/operator/recipe/shop/'+recipeId,function(res){
+        shopBaseData = res;
+
+        $.getJSON("/purchase/api/operator/recipe/detail/"+recipeId,{},function(res){
+            dataList = res;
+            renderHeadImgs();
+        })
+    });
+    
+    
+
+});
+$('.ritArea').on('click','.button .done-edit',function(){
+    if ($(this).html() === '编辑') {
+        var sid = $(this).parent().attr("data-skuid");
+        var skuOptTpl ='';
+        var factoryTpl ='';
+        for(var i=0 ;i<shopBaseData.sku_data.length;i++){
+            if(shopBaseData.sku_data[i].id==Number(sid)){
+                skuOptTpl += '<option selected="selected" value="'+shopBaseData.sku_data[i].id+'">'+shopBaseData.sku_data[i].name+'</option>'
+                factoryTpl = '<option>'+shopBaseData.sku_data[i].factory+'</option>'
+            }else{
+                skuOptTpl += '<option value="'+shopBaseData.sku_data[i].id+'">'+shopBaseData.sku_data[i].name+'</option>'
+            }
+        }
+        var number = 0;
+        for(var i=0; i<recipeData.sku_dict.length;i++){
+            if(recipeData.sku_dict[i].id ==Number(sid)){
+                number = recipeData.sku_dict[i].num;
+            }
+        }
+        var editorTpl = [
+            '<li id="table-ing-name">',
+                '<span>药品名称</span>',
+                '<select id="sku-sel" style="height: 35px;line-height: 35px;width: 225px;margin:5px;border:1px solid #e6e6e6">',
+                skuOptTpl,
+                '</select>',
+            '</li>',
+            '<li id="table-ing-pro">',
+                '<span>生产厂家</span>',
+                '<select id="factory-list" style="height: 35px;line-height: 35px;width: 225px;margin:5px;border:1px solid #e6e6e6">',
+                factoryTpl,
+                '</select>',
+            '</li>',
+            '<li>',
+                '<span class="num-padding">数量</span>',
+                '<input id="input-text" type="text" value="'+number+'">',
+            '</li>'];
+        $(this).parent().siblings("ul").html(editorTpl.join(""));
+        bindSkuSel();
+        $(this).html('保存')
+    } else if ($(this).html() === '保存'){
+    var skuselId = $("#sku-sel option:selected").val(); 
+    var preSkuId = $(this).parent().attr('data-skuid')
+    var inputtextId = $("#input-text").val();
+     if (inputtextId==""||isNaN(Number(inputtextId))||inputtextId <= 0){
+        sweetAlert("输入数量有误！");
+        return;
+    }
+    if(preSkuId !== skuselId) {
+        for(var j=0; j<recipeData.sku_dict.length; j++) {
+            if(skuselId == recipeData.sku_dict[j].id.toString()) {
+                sweetAlert('录入重复')
+                return
+            }
+        }
+    } 
+    for(var i=0; i<recipeData["sku_dict"].length;i++){
+        if(preSkuId == recipeData["sku_dict"][i].id){
+            var obj = {
+                      id:skuselId,
+                      num: parseInt(inputtextId)
+            }
+            recipeData.sku_dict.splice(i, 1,obj)
+        }
+    }  
+    selectRecipe(recipeData);   
+    }
+});
+$('.ritArea').on('click','.button .done-delete',function(){
+    var skuId = parseInt($(this).parent().attr('data-skuid'));
+    for(var i=0; i<recipeData["sku_dict"].length;i++){
+        if(skuId == recipeData["sku_dict"][i].id){
+            recipeData["sku_dict"].splice(i,1);
+        }
+    }
+    selectRecipe(recipeData)
+});
+$('.ritArea').on('click','.table-ing #table-ingbut',function(){
+    var skuselId = $("#sku-sel option:selected").val();
+    var inputtextId = $("#input-text").val();
+    if (skuselId == ""||inputtextId==""||isNaN(Number(inputtextId))||inputtextId <= 0){
+        sweetAlert("请输入正确内容");
+        return;
+    }
+    var factorlistId = $("#factory-list option:selected").val();
+    if(typeof(recipeData["sku_dict"])=="undefined"){
+        // 如果没有录入过
+        recipeData["sku_dict"] = [];
+    }else{
+        // 已经录入，校验是否录入过相同药品
+        for(var i=0;i<recipeData["sku_dict"].length;i++){
+            if (skuselId == recipeData["sku_dict"][i].id) {
+                sweetAlert("该药品已存在！请“编辑”！");
+                return;
+            }
+            
+        }
+        
+    }
+    // 加入药品
+    var obj = {
+      "id":skuselId,
+      "num": parseInt(inputtextId)
+    }
+    recipeData.sku_dict.push(obj);
+    
+    selectRecipe(recipeData)
+
+})
+$('.ritArea').on('click','.in-submit',function(){
+    var doctor = $('#doctor-list').val()
+    var hospital = $('#hosp-sel').val()
+    var proname = $('#sku-sel').val()
+    var proD = $('#factory-list').val()
+    var pronum = $('#input-text').val()
+    if (proname!="" && proD!="" &&pronum!=""){
+        sweetAlert("药品未添加完！点击“添加药品”！")
+        return
+    }
+    if (!hospital){
+        sweetAlert("请输入医院！")
+        return
+    }
+    if (!doctor){
+        sweetAlert("请输入医生！")
+        return
+    }
+    recipeData.doctor = doctor;
+    $.ajax({
+        contentType:"application/json;charset=utf-8;",
+        url: "/purchase/api/operator/recipepic/detail/" + picId,
+        type: 'PATCH',
+        dataType: 'json',
+        data: JSON.stringify(recipeData),
+    })
+    .done(function (data) {
+        if(data.status==200){
+            sweetAlert("保存成功");
+            $.getJSON("/purchase/api/operator/recipe/detail/"+recipeId,{},function(res){
+                dataList = res;
+                renderHeadImgs();
+            })
+        }
+    })
+    .fail(function () {
+        sweetAlert("操作失败！");
+    });
+}); 
+function showPanel(elem){
+    elem.addClass("active");
+    elem.siblings().removeClass("active");
+
+    var pic ="";
+    $.each(dataList,function(index,value){
+        if(value.id == picId){
+            pic = value.pic;
+        }
+    })
+    $('.entry-main .entry-table').show()
+    $('.entry-main .entry-position').show()
+    $('.entry-main .entry-picture .pic').replaceWith('<div class="pic" style="background-image: url(' + static_url + pic + ');"></div>');
+    $('.entry-main .entry-position a').replaceWith('<a href="'+ static_url + pic +'" download="chufang">下载图片</a>')
+}
+$('.ritArea').on('click', '.entry-img li', function() {
+    var elem = $(this);
+    var isinputFlag = elem.attr("data-isinput");
+    picId = parseInt(elem.attr('data-id'));
+    
+    if(isinputFlag=="1"){
+        $.getJSON('/purchase/api/operator/recipepic/detail/'+picId,function(res){
+            recipeData = res;
+            showPanel(elem);
+            selectRecipe(recipeData)
+        });
+    }else{
+        recipeData = {
+        }
+        showPanel(elem);
+        selectRecipe(recipeData)
+    }
+})
+
+$('.entry-main').on('click', '#em', function() {
+    picOperate('rotate')
+})
+$('.entry-main').on('click', '#strong', function() {
+    picOperate('scaleAdd')
+})
+$('.entry-main').on('click', '#i', function() {
+    picOperate('scaleSub')
+})
+var deg = 0
+var scale = 0
+
+function picOperate(type) {
+    if (type === 'rotate') {
+        if (deg === 3) {
+            deg = 0
+        } else {
+            deg += 1
+        }
+
+    } else if (type === 'scaleAdd') {
+        if (scale < 3) {
+            scale += 1
+        }
+
+    } else if (type === 'scaleSub') {
+        if (scale > 0) {
+            scale -= 1
+        }
+
+    }
+    var newclass = "deg" + deg + "-scale" + scale;
+    var width = (deg == 0 || deg == 2) ? (scale * 0.2 + 1) * 370 : (scale * 0.2 + 1) * 550;
+    var height = (deg == 0 || deg == 2) ? (scale * 0.2 + 1) * 550 : (scale * 0.2 + 1) * 370;
+    $('.entry-main .entry-picture .pic').width(width);
+    $('.entry-main .entry-picture .pic').height(height);
+    for (var i=0;i<dataList.length;i++) {
+        if (dataList[i].id == picId) {
+            $('.entry-main .entry-picture .pic').replaceWith('<div class="pic ' + newclass + '" style="background-image: url(' + static_url + dataList[i].pic + ');"></div>');
+            break;
+        }
+    }
+};
+</script>
+{% endblock %}

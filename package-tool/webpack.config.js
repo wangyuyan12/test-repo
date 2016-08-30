@@ -1,22 +1,23 @@
+'use strict'
 console.log('start')
-var path = require('path')
-var fs = require('fs')
-var webpack = require('webpack')
-var ExtractTextPlugin = require('extract-text-webpack-plugin')
-var configDir = require('./package.config').configDir
-var extractCss = require('./package.config').extractCss
+let path = require('path')
+let fs = require('fs')
+let webpack = require('webpack')
+let ExtractTextPlugin = require('extract-text-webpack-plugin')
+let configDir = require('./package.config').configDir
+let extractCss = require('./package.config').extractCss
 
 //
-/*var configDir = {
+/*let configDir = {
   enteryDir: ['./src/add-area/index.js', './src/sku-detail/index.js', './src/prod-detail/index.js'],
   outputDir: '/home/tzf/Documents/front/test-repo/vue-start/assets'  //支持一个输出路径
 }
 
 //是否提取css
-var extractCss = true*/
+let extractCss = true*/
 
 //判断开发环境还是生产环境
-var isProduction  = process.env.NODE_ENV === 'development' ? false : true   //设置为false——开发环境    // return true;  //设置为true——生产环境
+let isProduction  = process.env.NODE_ENV === 'development' ? false : true   //设置为false——开发环境    // return true;  //设置为true——生产环境
 console.log('isProduction', isProduction)
 
 if(configDir.outputDir === '') {
@@ -24,29 +25,112 @@ if(configDir.outputDir === '') {
 }
 console.log('configDir.outputDir', configDir.outputDir)
 
-var enteryFiles = function() {
-  var enteryObj = {}
+//判断路径是否存在，如果不存在则新建路径
+let makeDirIfNotExist = function(dir, cb) {
+  fs.stat(dir, function(err, state) {
+    if(err) {
+      fs.mkdir(dir, function(err) {
+        if(err) {
+          cb(err, null)
+        }
+        cb(null, true)
+      })
+    } else {
+      cb(null, true)
+    }
+  })
+    
+}
+//文件拷贝
+let fileCopy = function(folderPath, outPath) {
+  
+  fs.readdir(folderPath, function(err, files) {
+    if(err)
+       throw err
+   
+    files.map((item, index) => {
+      let src = path.join(folderPath, item)
+      let dst = path.join(outPath, item)    
+
+      fs.stat(src, function(err, state) {
+        if(err)
+          throw err
+        if(state.isFile()) { //如果是文件 拷贝
+          console.log('to wirte file', item)
+          let readAble = fs.createReadStream(src)
+          let writeAble = fs.createWriteStream(dst)
+          readAble.pipe(writeAble)
+        }
+        if(state.isDirectory()) { //如果是文件夹，重新循环
+          makeDirIfNotExist(path.join(outPath, item), function(err, state) {
+            if(err) 
+              throw err
+            fileCopy(path.join(folderPath, item), path.join(outPath, item))
+          })
+        }
+      })
+    })
+  })
+}
+//文件分析
+let copySourceCode = function() {
+  configDir.enteryDir.map((item, index) => {
+    fs.stat(item, function(err, state) {
+      if(err) {
+        console.log('exists', exists)
+        throw ( 'path' + item + 'is not a correct path!') 
+      }
+    })
+    ////拷贝文件
+    let folderPath = item.replace(/\/[a-zA-Z0-9_-]+\.js/, '')
+    // console.log('[%s] [floder path] [%s]: ', new Date(), folderPath)
+    let folderName = folderPath.split('/').pop()
+    let outDir = path.join(configDir.outputDir, folderName)
+
+    //判断路径是否存在//共两级路径
+    makeDirIfNotExist(outDir, function(err, state) {
+      if(err)
+        throw err
+      //判断source-code 路径是否存在
+      makeDirIfNotExist(path.join(outDir, 'code'), function(err, state) {
+        if(err)
+          throw err
+        fileCopy(folderPath, path.join(outDir, 'code'))
+      })
+    })     
+  })
+}
+
+//运行build时，拷贝源码
+if(isProduction) {
+  copySourceCode()
+}
+
+
+
+let enteryFiles = function() {
+  let enteryObj = {}
   if(configDir.enteryDir.length === 0 || configDir.enteryDir === undefined) {
     console.log('[webpack]', 'entry path need to configurated ')
     return
   } else {
     configDir.enteryDir.map((item, index) => {
-      var entry = fs.exists(item, function(exists) {
-        if(!exists) {
+      fs.stat(item, function(err, state) {
+        if(err) {
           console.log('exists', exists)
           throw ( 'path' + item + 'is not a correct path!') 
         }
       })
-
-      var filePath = /[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+\.js/.exec(item)[0].replace(/\.js/, '')  //filePath配置时把最后的 ‘/’去掉，否则在hot reload情况下，会出现文件无法找到情况
+      //打包文件
+      let filePath = /[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+\.js/.exec(item)[0].replace(/\.js/, '')  //filePath配置时把最后的 ‘/’去掉，否则在hot reload情况下，会出现文件无法找到情况
       console.log('filePath: ', filePath)
-      enteryObj[filePath] = [item]
+      enteryObj[filePath] = [item]      
     })
   }
   return enteryObj
 }
 
-var plugins = [
+let plugins = [
   new webpack.optimize.OccurenceOrderPlugin(),
   new webpack.NoErrorsPlugin(),
   // new webpack.optimize.CommonsChunkPlugin('common/common.js'),
