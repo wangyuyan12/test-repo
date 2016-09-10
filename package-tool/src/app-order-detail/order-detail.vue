@@ -123,7 +123,7 @@ export default {
 				}).then(resp => {
 					vm.orderNo = resp.number
 					if(resp.order_state === 2) {
-						vm.orderStatus = '待审核'
+						vm.orderStatus = '待厂家审核'
 					} else if(resp.order_state === 3) {
 						vm.orderStatus = '下单成功'
 					} else if(resp.order_state === 4) {

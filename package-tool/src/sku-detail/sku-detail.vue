@@ -1,4 +1,8 @@
 <style lang='less'>
+	img {
+		width: 100%;
+		height: 100%;
+	}
 	.fn-clear::after {
 	    display: block;
 	    font-size: 0;
@@ -41,19 +45,23 @@
 			.price-inter-part {
 				font-size: 1.8rem;
 			}
-			img {
-				margin-left: 10px;
-				height: 1.8rem;
-			}
-			.rate {
-				display: inline-block;
-				background: url('/static/classic/purchase/resource/rate-back.png');
-				background-size: 100% 100%;
+			.tag {
+				display: inline-block;	
 				margin-left: 10px;
 				line-height: 1.8rem;
 				color: #fff;
 				font-size: 1.2rem;
 				padding: 0 5px 0;
+			}
+			.rate {
+				background: url('/static/classic/purchase/resource/rate-auth.png');
+				background-size: 200% 100%;
+				background-position: 0 100%;
+			}
+			.auth {
+				background: url('/static/classic/purchase/resource/rate-auth.png');
+				background-size: 200% 100%;
+				background-position: 100% 100%;
 			}
 		}
 	}
@@ -83,10 +91,15 @@
 		text-align: center;
 		img {
 			height: 1.1rem;
+			width: 1.1rem;
 		}
 	}
 
 	.content-nav {
+		position: fixed;
+		top: 0;
+		width: 100%;
+		height: 5rem;
 		color: #323232;
 		font-size: 1.6rem;
 		text-align: center;
@@ -106,7 +119,7 @@
 	}
 
 	.content {
-		margin-top: 10px;
+		padding: 5.5rem 0;
 		background-color: #fff;
 		color: #646464;
 		font-size: 1.4rem;
@@ -119,15 +132,14 @@
 
 		.content-intro {
 			padding: 15px 10px 30px 15px;
-			/*white-space: pre-wrap;*/
+			
 		}
 	}
 	
 	.prod-param {
-		margin-top: 10px;
 		overflow: hidden;
 		background-color: #fff;
-		padding: 5px 10px 15px 15px;
+		padding: 5.5rem 15px;
 		font-size: 1.4rem;
 		color: #646464;
 
@@ -256,6 +268,10 @@
 	<div class="sku-detail">
 		<div id='page-one' class='page-one'
 			transition='leaveshow'
+			@touchstart ='touchStartP1'
+			@touchmove="touchMoveP1" 
+			@touchend="touchEndP1"
+			@touchcancel="touchCancelP1"
 			v-if='isPageOne'>
 			<div class='sku-banner'>
 				<!-- 等数据更新好之后，渲染slider，否则 呵呵 -->
@@ -267,14 +283,11 @@
 					<span>￥</span>
 					<span class='price-inter-part'>{{ priceInt}}</span>
 					<span class='price-decimal-part'>.{{ priceDeci }}</span>
-					<span class="rate">支付订金{{ rate }}%</span>
+					<span class="tag rate">支付订金{{ rate }}%</span>
+					<span v-if="authState == 1" class="tag auth">未授权</span>
 				</div>
 			</div>
-			<div class="sku-info"
-				@touchstart ='touchStartP1'
-				@touchmove="touchMoveP1" 
-				@touchend="touchEndP1"
-				@touchcancel="touchCancelP1">
+			<div class="sku-info">
 				<p>
 					<span class="info-left">规格:&nbsp;&nbsp;{{ specs }}</span>
 					<span class="info-right">库存数量:&nbsp;&nbsp;{{ stock }}</span>
@@ -288,11 +301,7 @@
 				</p>
 			</div>
 			<div id='show-more' class="show-more" 
-				:style="{height: showMoreHeight + 'px'}"
-				@touchstart ='touchStartP1'
-				@touchmove="touchMoveP1" 
-				@touchend="touchEndP1"
-				@touchcancel="touchCancelP1">
+				:style="{height: showMoreHeight + 'px'}">
 				<img src="/static/classic/purchase/resource/arrow.jpg">
 				<span>上拉显示更多</span>
 			</div>
@@ -305,20 +314,20 @@
 				<span :class="isProdCont ? '' : 'selected'"  @click="contSwitch(false)">规格参数</span>
 			</div>
 			<div class="content-container"
-				:style="{height: conthHeight + 'px'}" 
+				:style="{minHeight: conthHeight + 'px'}" 
 				@touchstart ='touchStartP2'
 				@touchmove="touchMoveP2" 
 				@touchend="touchEndP2"
 				@touchcancel="touchCancelP2">		
-				<div class="content" v-if='isProdCont'>
+				<div class="content" :style="{display: isProdCont ? 'block' : 'none'}">
 					<div class="content-head">
 						<span>产品详情</span>
 					</div>
 					<div class="content-intro" v-el:wordpic>
-						 {{ adMsg }} 
+						 <!-- {{ contentIntro }} -->
 					</div>
 				</div>
-				<div class="prod-param" v-else>
+				<div class="prod-param" :style="{display: isProdCont ? 'none' : 'block'}">
 					<p>
 						<span class="intro-left">规格:&nbsp;&nbsp;{{ specs }}</span>
 						<span class="intro-right">剂型:&nbsp;&nbsp;{{ dosageForm }}</span>
@@ -385,6 +394,7 @@ export default {
 			priceInt: '00',
 			priceDeci: '00',
 			rate: 0,
+			authState: 1,
 			specs: '--',
 			stock: '--',
 			dosageForm: '--',
@@ -397,11 +407,12 @@ export default {
 			license: '--',
 			factory: '--',
 			company: '--',
-			adMsg: '--',
+			contentIntro: '--',
 			isProdCont: true,
 			isPageOne: true,
 			startY: 0,
 			offsetY: 0,
+			offsetTop: 0,
 			imgs: [],  //先置为空
 			addCartNum: 0,
 			cartStatus: 0, //1: 加入购物车; 2: 确定; 0: 下架/库存不足
@@ -414,62 +425,76 @@ export default {
 			this.isProdCont = stat
 		},
 		touchStartP1(e) {
-			e.preventDefault()
+			this.offsetTop = document.body.clientHeight - window.innerHeight
+			this.offsetTop = this.offsetTop > 0 ? this.offsetTop : 0  //存在屏幕大于body情况
 			let touch = e.touches[0]
-			this.startY = touch.pageY
+			if( Math.abs( this.offsetTop - document.body.scrollTop) < 5 ) { //当移动到底部的时候开始统计
+				this.startY = touch.pageY
+			}
 		},
 		touchMoveP1(e) {
-			e.preventDefault()
 			let touch = e.touches[0]
 			this.offsetY = touch.pageY - this.startY
-			if(this.offsetY < 0) {
-				document.getElementById('page-one').style.top = this.offsetY + 'px'
+			if( Math.abs( this.offsetTop - document.body.scrollTop) < 5 ) {  //当移动到底部的时候进行相关操作
+				if(this.offsetY < 0 ) { //上拉
+					e.preventDefault()
+					document.getElementById('page-one').style.top = this.offsetY + 'px'
+				}
+				if(this.offsetY < -50 ) { //上拉触发页面切换
+					e.preventDefault()
+					this.isPageOne = false
+				}	
 			}
-			if(this.offsetY < -100) {
-				this.isPageOne = false
-				// this.isProdCont = true
-			}
+			
 		},
-		touchEndP1(e) {
-			e.preventDefault()
-			document.getElementById('page-one').style.top = 0 + 'px'
-			this.$els.wordpic.innerHTML = this.adMsg  //渲染图文详情
+		touchEndP1(e) {	
+			e.preventDefault()		
+			if( this.$els.wordpic ) {
+				this.$els.wordpic.innerHTML = this.contentIntro  //渲染图文详情
+				document.body.scrollTop = 0  //打开新页面，scroll 回顶部
+			}
 			return
 		},
 		touchCancelP1(e) {
-			e.preventDefault()
-			document.getElementById('page-one').style.top = 0 + 'px'
-			this.$els.wordpic.innerHTML = this.adMsg  //渲染图文详情
+			e.preventDefault()		
+			if( this.$els.wordpic ) {
+				this.$els.wordpic.innerHTML = this.contentIntro  //渲染图文详情
+				document.body.scrollTop = 0  //打开新页面，scroll 回顶部
+			}
 			return
 		},
 		touchStartP2(e) {
-			e.preventDefault()
 			let touch = e.touches[0]
 			this.startY = touch.pageY
 		},
 		touchMoveP2(e) {
-			e.preventDefault()
 			let touch = e.touches[0]
 			this.offsetY = touch.pageY - this.startY
-			if(this.offsetY > 0) {
-				document.getElementById('page-two').style.top = this.offsetY + 'px'
-			}
-			if(this.offsetY > 100) {
-				this.isPageOne = true
+			if(this.offsetY > 0 && document.body.scrollTop == 0) {  //页面回到顶部，下拉
+				e.preventDefault()
+				if(this.offsetY > 0) {
+					document.getElementById('page-two').style.top = this.offsetY + 'px'
+				}
+				if(this.offsetY > 100) {
+					this.isPageOne = true
+				}
 			}
 		},
 		touchEndP2(e) {
-			e.preventDefault()
-			document.getElementById('page-two').style.top = 0 + 'px'
-			return
+			if( this.offsetY > 0 && document.body.scrollTop == 0) {
+				e.preventDefault()
+				document.getElementById('page-two').style.top = 0 + 'px'
+				return
+			}
 		},
 		touchCancelP2(e) {
-			e.preventDefault()
-			document.getElementById('page-two').style.top = 0 + 'px'
-			return
+			if(document.body.scrollTop == 0) {
+				e.preventDefault()
+				document.getElementById('page-two').style.top = 0 + 'px'
+				return
+			}
 		},
 		addCart() {
-			
 			if(this.cartStatus === 2) {
 				let param = [{id: this.skuId, num: this.addCartNum }]
 				param = JSON.stringify(param)
@@ -548,6 +573,7 @@ export default {
 			vm.dosageForm = resp.sku.dosage_form || '--'
 			vm.unit = resp.unit || '--'
 			vm.rate = parseFloat(resp.rate) * 100 || 0
+			vm.authState = resp.sku_auth ? resp.sku_auth.auth_state : 1
 			vm.limit = resp.limit === 1 ? '中包' : (resp.limit === 2 ? '整件' : '拆零')
 			if(resp.sku.pics.length > 0) {
 
@@ -560,7 +586,8 @@ export default {
 				vm.imgs = [{ad_pic: '//static.eyaos.com/images/no_product.png'}]
 			}
 			vm.stock = resp.sku_stock ? resp.sku_stock.stock : 0
-			vm.adMsg =  resp.sku.ad_msg || '--'
+			vm.contentIntro =  resp.sku.content.replace(/height:\w+/g, 'height:100%') || '--'
+			vm.contentIntro = vm.contentIntro.replace(/width:\w+/g, 'width:100%')
 			vm.midBag = resp.middle || '--'
 			vm.largeBag = resp.package || '--'
 			vm.isMedCare = resp.sku_pro ? (resp.sku_pro.yibao ? '是' : '否') : '否'

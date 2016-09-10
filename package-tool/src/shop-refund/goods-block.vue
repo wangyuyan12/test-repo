@@ -208,13 +208,13 @@
 				<span v-else class="detail">数量：
 					<span class="num-cunt">
 						<input type="button" @click="subNum" value="-"> 
-						<input class="return-num" @input="numChange" type="text" :value="returnNum" v-el:returnnum>
+						<input class="return-num" @input="numChange" type="text" :value="returnNum" :placeholder="orderedNum" v-el:returnnum>
 						<input type="button" @click="addNum" value="+">
 					</span>
 				</span>
 				
 				 <br>
-				<span class="sum">总计</span> <br>
+				<span class="sum">总计</span><br>
 
 				<span phone="13212342345" @click="callFactory" class="factory tz-no-wrap" v-el:factorynum>
 					<img src="./resource/phone.png" alt="">
@@ -252,7 +252,8 @@ export default {
 			phone: '',
 			showHide: 'none',
 			selected: false,
-			returnNum: 0,
+			returnNum: null,
+			orderedNum: null,
 			sum: 0,
 		}
 	},
@@ -301,6 +302,7 @@ export default {
 	beforeCompile() {
 		this.sum = parseFloat( this.prodInfo.price ) * parseFloat( this.prodInfo.num )
 		this.pic = this.prodInfo.sku.pic ? this.prodInfo.sku.pic : '//static.eyaos.com/images/no_product.png'
+		this.orderedNum = this.prodInfo.num.toString().trim()
 	},
 	filters: {
 		formatPrice (price) {

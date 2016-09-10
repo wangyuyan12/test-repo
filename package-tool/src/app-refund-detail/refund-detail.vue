@@ -30,6 +30,13 @@
 		}
 	}
 
+	.shop {
+		overflow: auto;
+		.shop-detail {
+			margin-bottom: 5.5rem;
+		}
+	}
+
 	.footer {
 		position: fixed;
 		bottom: 0;
@@ -82,6 +89,7 @@
 				line-height: 4.5rem;
 				border-top: 1px solid #d9d9d9;
 				input {
+					appearance: none;
 					width: 49%;
 					color: #30b2fb;
 					border: 0;
@@ -127,13 +135,13 @@
 			<p>联系电话:&nbsp;&nbsp;{{ phone }}</p>
 		</div>
 	</div>
-	<div v-if="footType === 1" class="footer change-state">
+	<!-- <div v-if="footType === 1" class="footer change-state">
 		<input type="button" class="reject" @click="confirmOperate(2)" value="拒绝">
 		<input type="button" @click="confirmOperate(3)" value="同意">
 	</div>
 	<div  v-if="footType === 2"  class="footer confirm">
 		<input type="button" @click="confirmOperate(4)" class="checked-good" value="确认收货">
-	</div>
+	</div> -->
 
 	<div class="confirm-cover" :style="{display: showConfirm}">
 		<div class="confirm-win">
@@ -180,11 +188,11 @@ export default {
 				'取消退货',  //0
 				'待审核',   //1
 				'待商业公司/平台审核', //2
-				'待厂家/平台审核', //3
-				'待厂家/商业公司审核',  //4
+				'待审核', //3
+				'待审核',  //4
 				'待平台审核',  //5
 				'待商业公司审核',  //6
-				'待厂家审核',  //7
+				'待审核',  //7
 				'待药店退货',  //8
 				'待厂家收货',  //9
 				'退货成功',   //10

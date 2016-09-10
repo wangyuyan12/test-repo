@@ -3,14 +3,13 @@
 //打包路径配置
 var configDir = {
   enteryDir: [
-  			 './src/sku-detail/index.js',
-  			 './src/order-detail/index.js',
-         './src/order-cancel/index.js',
-         './src/shop-refund/index.js',
-         './src/refund-detail/index.js',
+  			 // './src/sku-detail/index.js',
+  			 // './src/order-detail/index.js',
+         // './src/order-cancel/index.js',
+         // './src/shop-refund/index.js',
+         // './src/refund-detail/index.js',
          './src/app-order-detail/index.js',
          './src/app-refund-detail/index.js',
-         // './src/proxy-apply/index.js'
   			 ],
    outputDir: '/home/tzf/Documents/eyaos/eyaos_web/web/static/classic/purchase/'  //支持一个输出路径
 }
@@ -25,7 +24,6 @@ var ngrokConfig= {
 	proto: 'http', // http|tcp|tls  (default： http)
   subDomain: 'feifeiyuonpe'
 }
-
 
 module.exports = {
 	configDir: configDir,
